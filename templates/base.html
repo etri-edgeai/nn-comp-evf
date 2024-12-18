@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+        <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+        <title>Edge Vision Framework</title>
+
+        <!-- CSS -->
+        <link href="/static/dist/css/tabler.min.css" rel="stylesheet" />
+        <link href="/static/dist/css/tabler-vendors.min.css" rel="stylesheet" />
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" />
+        <link href="https://cdn.jsdelivr.net/npm/tabler-icons@1.39.1/iconfont/tabler-icons.min.css" rel="stylesheet">
+        <link href="https://cdn.jsdelivr.net/npm/@tabler/icons@1.39.1/iconfont/tabler-icons.min.css" rel="stylesheet">
+        <script src="/static/ace/src-min/ace.js" type="text/javascript"></script>
+
+
+        <!-- Core Scripts -->
+        <script src="/static/dist/js/tabler.min.js"></script>
+        <script src="/static/js/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
+        <!-- Page Initialization -->
+        <script>
+            $(document).ready(function () {
+                toastr.options = {
+                    closeButton: true,
+                    progressBar: true,
+                    positionClass: "toast-top-right",
+                    timeOut: "5000",
+                    extendedTimeOut: "1000",
+                    showMethod: "fadeIn",
+                    hideMethod: "fadeOut"
+                };
+
+                // Highlight active menu item based on URL
+                const currentPath = window.location.pathname;
+                $(".navbar-nav .nav-link").each(function () {
+                    if (this.href.includes(currentPath)) {
+                        $(this).addClass("active");
+                    } else {
+                        $(this).removeClass("active");
+                    }
+                });
+            });
+        </script>
+    </head>
+
+    <body class="layout-fluid">
+        <div class="page">
+            <!-- Sidebar -->
+            <aside class="navbar navbar-vertical navbar-expand-lg navbar-dark">
+                <div class="container-fluid">
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#sidebar-menu">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+
+                    <h1 class="navbar-brand navbar-brand-autodark">
+                        <img src="/static/images/logo.png" alt="Edge Vision Framework" class="navbar-brand-image">
+                        <span class="p-2 text-white">Edge Vision<br>Framework</span>
+                    </h1>
+
+                    <div class="collapse navbar-collapse" id="sidebar-menu">
+                        <!-- Replace the existing project selection section with this: -->
+                        <div class="px-3 my-3">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <div class="d-flex align-items-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon me-2" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                        <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                        <path d="M3 7a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v10a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2v-10z" />
+                                        <path d="M3 7l9 6l9 -6" />
+                                    </svg>
+                                    <span class="text-muted">Current Project</span>
+                                </div>
+                                <div class="btn-group">
+                                    <button class="btn btn-sm btn-success" title="Create project" data-bs-toggle="modal" data-bs-target="#id_modal_create_project">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                            <path d="M12 5l0 14" />
+                                            <path d="M5 12l14 0" />
+                                        </svg>
+                                    </button>
+                                    <button class="btn btn-sm btn-danger" title="Delete project" data-bs-toggle="modal" data-bs-target="#id_modal_delete_project" id="btn_delete_project">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                            <path d="M4 7h16" />
+                                            <path d="M10 11l0 6" />
+                                            <path d="M14 11l0 6" />
+                                            <path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12" />
+                                            <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3" />
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                            <select id="id_project" class="form-select text-dark" aria-label="Select Project" style="color: #000000; background-color: #ffffff;">
+                                <option value="">Select Project</option>
+                            </select>
+                        </div>
+
+                        <ul class="navbar-nav pt-lg-3">
+                            <li class="nav-item">
+                                <a class="nav-link" href="/dashboard">
+                                    <i class="ti ti-dashboard"></i>
+                                    Dashboard
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="/datasets">
+                                    <i class="ti ti-database"></i>
+                                    Datasets
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="/models">
+                                    <i class="ti ti-box"></i>
+                                    Models
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="/optimizations">
+                                    <i class="ti ti-rocket"></i>
+                                    Optimizations
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="/runs">
+                                    <i class="ti ti-list"></i>
+                                    Runs
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="/monitor">
+                                    <i class="ti ti-eye"></i>
+                                    Monitoring
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="/deployment">
+                                    <i class="ti ti-cloud-upload"></i>
+                                    Deployment
+                                </a>
+                            </li>
+                        </ul>
+
+                        <div class="mt-auto">
+                            <div class="nav-item dropdown">
+                                <a href="#" class="nav-link" data-bs-toggle="dropdown">
+                                    <span class="avatar avatar-sm">{{ session['user']|first|upper }}</span>
+                                    <span class="ps-2">{{ session['user'] }}</span>
+                                </a>
+                                <div class="dropdown-menu dropdown-menu-end">
+                                    <a href="#" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#modal-logout">
+                                        <i class="ti ti-logout"></i>
+                                        Logout
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Page Content -->
+            <div class="page-wrapper">
+                {% block content %}{% endblock %}
+            </div>
+
+            <!-- Modals -->
+            <div class="modal modal-blur fade" id="id_modal_create_project" tabindex="-1">
+                <div class="modal-dialog modal-sm modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5>Create Project</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <label for="id_project_name">Project Name</label>
+                            <input id="id_project_name" type="text" class="form-control" placeholder="Enter project name">
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="button" class="btn btn-primary" id="id_create_project_ok">Create</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal modal-blur fade" id="id_modal_delete_project" tabindex="-1">
+                <div class="modal-dialog modal-sm modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-body">
+                            <p>Are you sure you want to delete this project?</p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="button" class="btn btn-danger" id="id_delete_project_ok">Delete</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal modal-blur fade" id="modal-logout" tabindex="-1">
+                <div class="modal-dialog modal-sm modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-body">
+                            <p>Are you sure you want to logout?</p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="button" class="btn btn-danger" id="id_logout_ok">Logout</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {% block scripts %}{% endblock %}
+        <!-- Add this right before </body> -->
+    <script src="/static/src/base.js"></script>
+    <script>
+        document.addEventListener('keydown', function(e) {
+            if ((e.key === 's' || e.key === 'S') && (navigator.platform.match("Mac") ? e.metaKey : e.ctrlKey)) {
+                e.preventDefault();
+                return false;
+            }
+        }, {passive: false});
+    </script>
+    </body>
+</html>
