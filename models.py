@@ -372,7 +372,7 @@ def clear_temp():
         if os.path.exists(temp_path):
             # Use rmtree with onerror handler to handle permission issues
             def handle_remove_readonly(func, path, exc):
-                os.chmod(path, stat.S_IWRITE)
+                # os.chmod(path, stat.S_IWRITE)
                 func(path)
                 
             shutil.rmtree(temp_path, onerror=handle_remove_readonly)
