@@ -2,7 +2,11 @@
 
 A web application framework for managing and optimizing deep learning models for edge devices with GPU support and real-time monitoring capabilities.
 
+
+
 ## Key Features
+
+
 
 - 🚀 **Project Management**: Organize models, datasets, and experiments in isolated workspaces
 - 🎯 **Model Training**: Train models with automatic GPU resource allocation
