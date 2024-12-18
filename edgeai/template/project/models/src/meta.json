@@ -1,0 +1,8 @@
+{
+    "model_name": "vit_b_16",
+    "model_path": "./workspace/models/vit_b_16",
+    "task_type": "train",
+    "status": "In Progress",
+    "version": "1.0",
+    "misc": ""
+}

@@ -1,0 +1,172 @@
+import os
+import importlib
+import yaml
+import time
+import logging
+import pytorch_lightning as pl
+from torch.utils.data import DataLoader
+from pytorch_lightning.loggers import TensorBoardLogger
+from pytorch_lightning.strategies import DDPStrategy
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(levelname)s - %(message)s",
+    handlers=[
+        logging.FileHandler("run.log", mode="w"),
+        logging.StreamHandler()
+    ]
+)
+
+# Load configuration file
+def load_config(config_path='config.yaml'):
+    with open(config_path, 'r') as f:
+        config = yaml.safe_load(f)
+    return config
+
+# Dynamically load the dataset, model, and optimizer classes
+class Engine(pl.LightningModule):
+    def __init__(self, config):
+        super(Engine, self).__init__()
+        self.config = config
+
+        # Dynamically load Dataset
+        self.dataset = _Dataset()
+
+        # Dynamically load Model
+        self.model = _Model()
+
+        # Dynamically load Optimizer (if optimization code exists)
+        self.optimizer_class = _Optimization(self.model)
+
+        # Initialize Loss Function
+        loss_module = importlib.import_module("torch.nn")
+        self.criterion = getattr(loss_module, config['training']['loss_function'])()
+
+        # Metrics and state tracking
+        self.epoch_start_time = None
+        self.epoch_losses = []
+        self.lr = config['optimization']['optimizer']['params']['lr']
+        self.best_loss = float('inf')
+        self.val_losses = []
+        self.total_epochs = config['training']['epochs']
+
+    def forward(self, *inputs):
+        return self.model(*inputs)
+
+    def training_step(self, batch, batch_idx):
+        if batch_idx == 0:
+            self.epoch_start_time = time.time()
+            self.epoch_losses = []
+            if self.global_rank == 0:
+                logging.info(f"\n=== Epoch {self.current_epoch + 1}/{self.total_epochs} ===")
+
+        inputs, targets = batch
+        outputs = self(*inputs) if isinstance(inputs, (list, tuple)) else self(inputs)
+        loss = self.criterion(outputs, targets)
+
+        self.epoch_losses.append(loss.item())
+
+        total_batches = len(self.trainer.train_dataloader)
+        avg_loss = sum(self.epoch_losses) / len(self.epoch_losses)
+        progress = (batch_idx + 1) / total_batches * 100
+        elapsed_time = time.time() - self.epoch_start_time
+        eta = elapsed_time / (batch_idx + 1) * (total_batches - batch_idx - 1)
+
+        if self.global_rank == 0 and batch_idx % max(1, total_batches // 10) == 0:
+            logging.info(
+                f"[Epoch {self.current_epoch + 1}] Progress: {progress:.1f}% | "
+                f"Loss: {avg_loss:.4f} | ETA: {eta / 60:.2f} min | "
+                f"Elapsed: {elapsed_time:.2f}s | LR: {self.lr:.2e}"
+            )
+
+        self.log("training_loss", avg_loss, prog_bar=True, sync_dist=True)
+        self.log("progress", progress, prog_bar=True, sync_dist=True)
+        self.log("eta", eta, prog_bar=True, sync_dist=True)
+
+        return loss
+
+    def on_train_epoch_end(self):
+        avg_loss = sum(self.epoch_losses) / len(self.epoch_losses)
+        epoch_time = time.time() - self.epoch_start_time
+        remaining_epochs = self.total_epochs - self.current_epoch - 1
+        eta_total = epoch_time * remaining_epochs
+
+        if self.global_rank == 0:
+            logging.info(f"Epoch Summary: Average Loss: {avg_loss:.4f} | "
+                         f"Epoch Time: {epoch_time:.2f}s | "
+                         f"Remaining Time: {eta_total / 60:.2f} min")
+
+        self.log("epoch_avg_loss", avg_loss, sync_dist=True)
+        self.log("epoch_time", epoch_time, sync_dist=True)
+        self.log("eta_total", eta_total, sync_dist=True)
+
+    def validation_step(self, batch, batch_idx):
+        inputs, targets = batch
+        outputs = self(*inputs) if isinstance(inputs, (list, tuple)) else self(inputs)
+        loss = self.criterion(outputs, targets)
+        self.val_losses.append(loss.item())
+        return loss
+
+    def on_validation_epoch_end(self):
+        if self.val_losses:
+            avg_val_loss = sum(self.val_losses) / len(self.val_losses)
+            if self.global_rank == 0:
+                logging.info(f"Validation Loss: {avg_val_loss:.4f}")
+            self.log("validation_loss", avg_val_loss, sync_dist=True)
+            self.val_losses = []
+
+    def configure_optimizers(self):
+        optimizer_module = importlib.import_module("torch.optim")
+        OptimizerClass = getattr(optimizer_module, self.config['optimization']['optimizer']['name'])
+        optimizer = OptimizerClass(self.model.parameters(), **self.config['optimization']['optimizer']['params'])
+
+        scheduler = None
+        if 'scheduler' in self.config['optimization'] and self.config['optimization']['scheduler']:
+            scheduler_module = importlib.import_module("torch.optim.lr_scheduler")
+            SchedulerClass = getattr(scheduler_module, self.config['optimization']['scheduler']['name'])
+            scheduler = SchedulerClass(optimizer, **self.config['optimization']['scheduler']['params'])
+            return [optimizer], [scheduler]
+
+        return optimizer
+
+    def train_dataloader(self):
+        return DataLoader(self.dataset, batch_size=self.config['training']['batch_size'], shuffle=True, num_workers=4)
+
+    def val_dataloader(self):
+        return DataLoader(self.dataset, batch_size=self.config['training']['batch_size'], shuffle=False, num_workers=4)
+
+def main():
+    config = load_config()
+    pl.seed_everything(config.get('misc', {}).get('seed', 42))
+
+    logger = TensorBoardLogger(
+        save_dir=config['misc']['log_dir'],
+        name="lightning_logs"
+    )
+
+    # Set distributed backend to 'gloo'
+    os.environ["PL_TORCH_DISTRIBUTED_BACKEND"] = "gloo"
+
+    use_gpu = (config['training']['num_gpus'] > 0 and torch.cuda.is_available())
+    accelerator = "gpu" if use_gpu else "cpu"
+    devices = config['training']['num_gpus'] if use_gpu else 1
+
+    trainer = pl.Trainer(
+        max_epochs=config['training']['epochs'],
+        accelerator=accelerator,
+        devices=devices,
+        logger=logger,
+        enable_progress_bar=False,
+        strategy=DDPStrategy(process_group_backend="gloo")
+    )
+
+    model = Engine(config)
+
+    trainer.fit(model)
+
+    os.makedirs(config['misc']['checkpoint_dir'], exist_ok=True)
+    trainer.save_checkpoint(os.path.join(config['misc']['checkpoint_dir'], 'final_model.ckpt'))
+
+if __name__ == '__main__':
+    main()

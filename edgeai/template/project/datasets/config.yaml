@@ -1,0 +1,7 @@
+img_size: 32
+augmentation:
+  random_crop: true
+  horizontal_flip: true
+normalize:
+  mean: [0.5071, 0.4865, 0.4409]
+  std: [0.2673, 0.2564, 0.2762]

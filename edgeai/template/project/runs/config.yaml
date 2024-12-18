@@ -1,0 +1,43 @@
+# config.yaml
+
+# Dataset Configuration
+dataset:
+  name: "Dataset"  # e.g., CustomDataset
+  params:
+    data_dir: "/path/to/data"
+    transform: "transforms.Compose([...])"  # Any data transformations
+
+# Model Configuration
+model:
+  name: "Model"  # e.g., CustomModel
+  params:
+    input_size: 784
+    hidden_layers: [128, 64]
+    output_size: 10
+    dropout: 0.5
+
+# Optimization Configuration
+optimization:
+  optimizer:
+    name: "Adam"  # e.g., Adam, SGD
+    params:
+      lr: 0.001
+      weight_decay: 1e-4
+  scheduler:
+    name: "StepLR"  # e.g., StepLR, ExponentialLR
+    params:
+      step_size: 10
+      gamma: 0.1
+
+# Training Configuration
+training:
+  batch_size: 32
+  epochs: 20
+  num_gpus: 2
+  loss_function: "CrossEntropyLoss"  # e.g., CrossEntropyLoss, MSELoss
+
+# Additional Configurations
+misc:
+  seed: 42
+  log_dir: "./logs"
+  checkpoint_dir: "./checkpoints"

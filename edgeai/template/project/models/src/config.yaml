@@ -1,0 +1,8 @@
+# Model parameters 
+model_params:
+  num_classes: 100
+  pretrained: true
+  dropout_rate: 0.1
+  fine_tune: true
+  input_size: [224, 224]
+  patch_size: 16

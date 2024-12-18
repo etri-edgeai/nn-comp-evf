@@ -1,0 +1,30 @@
+#import.txt
+import os
+import yaml
+import torch
+import pytorch_lightning as pl
+from pytorch_lightning.loggers import TensorBoardLogger
+from torch.utils.data import DataLoader
+import importlib
+import sys
+from tqdm import tqdm
+import time
+sys.path.insert(0, '.')
+
+def verify_gpu_setup():
+    cuda_visible = os.environ.get('CUDA_VISIBLE_DEVICES', '')
+    print(f"\nCUDA_VISIBLE_DEVICES={cuda_visible}")
+    
+    if torch.cuda.is_available():
+        n_gpus = torch.cuda.device_count()
+        print(f"PyTorch CUDA initialized - {n_gpus} GPU(s) available")
+        for i in range(n_gpus):
+            print(f"  GPU {i}: {torch.cuda.get_device_name(i)}")
+    else:
+        print("PyTorch CUDA not available")
+        
+    return torch.cuda.is_available()
+
+# Call GPU verification before anything else
+has_gpu = verify_gpu_setup()
+sys.path.insert(0, '.')
