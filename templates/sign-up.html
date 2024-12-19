@@ -1,0 +1,53 @@
+<!doctype html>
+
+<html lang="en">
+
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+	<meta http-equiv="X-UA-Compatible" content="ie=edge" />
+	<title>Sign up</title>
+	<link href="/static/dist/css/tabler.min.css" rel="stylesheet" />
+</head>
+
+<body>
+	<div class="page page-center">
+		<div class="container-tight py-4">
+			<form class="card card-md" action="/auth/signup" method="post">
+				<div class="card-body">
+					<img class="mx-auto d-block" src="/static/images/logo.png" height="80" alt="">
+					<p class="h1 text-center mb-3 mt-3">Sign up Edgifi</p>
+					{% with messages = get_flashed_messages() %}
+					{% if messages %}
+					<div class="alert alert-warning" role="alert">{{ messages[0] }}</div>
+					{% endif %}
+					{% endwith %}
+					<div class="mb-3">
+						<label class="form-label">ID</label>
+						<input name="user" type="text" class="form-control" value="{{ user }}" placeholder="Enter ID" autocomplete="off">
+					</div>
+					<div class="mb-3">
+						<label class="form-label">Password</label>
+						<div class="input-group input-group-flat">
+							<input name="password1" type="password" class="form-control" placeholder="Password" autocomplete="off">
+						</div>
+					</div>
+					<div class="mb-3">
+						<label class="form-label">Confirm Password</label>
+						<div class="input-group input-group-flat">
+							<input name="password2" type="password" class="form-control" placeholder="Password" autocomplete="off">
+						</div>
+					</div>
+					<div class="form-footer">
+						<button type="submit" class="btn btn-primary w-100">Sign up</button>
+					</div>
+				</div>
+			</form>
+			<div class="text-center text-muted mt-3">
+				Already have account? <a href="/" tabindex="-1">Sign in</a>
+			</div>
+		</div>
+	</div>
+</body>
+
+</html>
