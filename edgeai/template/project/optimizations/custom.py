@@ -3,10 +3,15 @@
 class Optimizer:
     def __init__(self, model):
         """
-        Initializes the optimizer with the given model.
-        
-        Parameters:
-        model (torch.nn.Module): The original PyTorch model to be optimized.
+        Optimizer class to apply custom optimizations to a PyTorch model.
+
+        Example:
+        --------
+        >>> from custom import Optimizer
+        >>> import torch.nn as nn
+        >>> model = nn.Sequential(nn.Linear(10, 10))
+        >>> optimizer = Optimizer(model)
+        >>> optimized_model = optimizer.optimize()
         """
         self.model = model
 
