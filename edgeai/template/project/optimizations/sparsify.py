@@ -10,6 +10,12 @@ class Sparsify:
         self.sparsity = sparsity
 
     def apply(self):
+        """
+        Applies sparsity to the model.
+
+        Returns:
+        torch.nn.Module: The sparsified model.
+        """
         for module in self.model.modules():
             if isinstance(module, nn.Linear):
                 prune.random_unstructured(module, name='weight', amount=self.sparsity)
