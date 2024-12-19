@@ -13,3 +13,15 @@ class WeightPruning:
         """
         self.model = model
         self.amount = amount
+    
+    def prune(self):
+        """
+        Applies weight pruning to the model.
+
+        Returns:
+        torch.nn.Module: The pruned model.
+        """
+        for module in self.model.modules():
+            if isinstance(module, (nn.Conv2d, nn.Linear)):
+                prune.l1_unstructured(module, name='weight', amount=self.amount)
+        return self.model
