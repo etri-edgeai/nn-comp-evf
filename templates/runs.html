@@ -1,0 +1,220 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="page-wrapper">
+    <div class="container-fluid py-4">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h3 class="card-title">Runs</h3>
+                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#id_modal_create_run">Create Run</button>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Run Name</th>
+                                <th>Created Date</th>
+                                <th>Model</th>
+                                <th>Dataset</th>
+                                <th>Optimization</th>
+                                <th>Status</th>
+                                <th>GPU(s)</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="id_table_body_runs">
+                            <!-- Run rows will be dynamically populated here by runs.js -->
+                        </tbody>
+                    </table>
+                </div>
+                <div id="logs_container" style="height: 500px; overflow-y: scroll; background-color: white; padding: 10px; border: 1px solid #ccc;">
+                    <div id="logs_content" style="font-family: 'Courier New', monospace; color: black;"></div>
+                </div>
+                
+                <style>
+                    .log-line {
+                        display: block;
+                        white-space: pre;
+                        line-height: 1.5;
+                        min-height: 1.5em;
+                    }
+                </style>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Create Run Modal -->
+<div class="modal fade" id="id_modal_create_run" tabindex="-1" aria-labelledby="createRunModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Create Run</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Form inputs -->
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label required">Run Name</label>
+                        <input id="id_run_name" type="text" class="form-control" placeholder="Enter run name" autocomplete="off">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label required">Number of GPUs</label>
+                        <input id="id_num_gpus" type="number" class="form-control" min="1" max="{{ gpu_count }}" value="1">
+                        <small class="form-text text-muted">Available GPUs: <span id="id_gpu_count">{{ gpu_count }}</span></small>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <label class="form-label required">Model</label>
+                        <select id="id_select_model" class="form-select">
+                            <option value="">Select a Model</option>
+                            <!-- Options will be populated dynamically -->
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label required">Dataset</label>
+                        <select id="id_select_dataset" class="form-select">
+                            <option value="">Select a Dataset</option>
+                            <!-- Options will be populated dynamically -->
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label required">Optimization</label>
+                        <select id="id_select_optimization" class="form-select">
+                            <option value="">Select an Optimization</option>
+                            <!-- Options will be populated dynamically -->
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Generate Engine Code Button -->
+                <div class="mb-3">
+                    <button id="id_generate_engine_code" type="button" class="btn btn-secondary" disabled>Generate Basic Engine Code</button>
+                </div>
+
+                <!-- Buttons moved above the editor tabs -->
+                <div class="mb-3 d-flex justify-content-end">
+                    <button type="button" class="btn btn-link me-2" data-bs-dismiss="modal">Cancel</button>
+                    <button id="id_create_run_ok" type="button" class="btn btn-primary">Create Run</button>
+                </div>
+
+                <!-- Tabs for engine.py and config.yaml -->
+                <ul class="nav nav-tabs" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active" data-bs-toggle="tab" href="#tab_engine_py" role="tab">engine.py</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-bs-toggle="tab" href="#tab_config_yaml" role="tab">config.yaml</a>
+                    </li>
+                </ul>
+                
+                <div class="tab-content mt-3">
+                    <div class="tab-pane fade show active" id="tab_engine_py" role="tabpanel">
+                        <div id="editor_engine_py" class="editor"></div>
+                    </div>
+                    <div class="tab-pane fade" id="tab_config_yaml" role="tabpanel">
+                        <div id="editor_config_yaml" class="editor"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Edit Run Modal -->
+<div class="modal fade" id="id_modal_edit_run" tabindex="-1" aria-labelledby="editRunModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Run</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Form inputs -->
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label required">Run Name</label>
+                        <input id="id_edit_run_name" type="text" class="form-control" placeholder="Enter run name" autocomplete="off">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label required">Number of GPUs</label>
+                        <input id="id_edit_num_gpus" type="number" class="form-control" min="1" max="{{ gpu_count }}" value="1">
+                        <small class="form-text text-muted">Available GPUs: <span id="id_edit_gpu_count">{{ gpu_count }}</span></small>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <!-- Changed from plaintext to select dropdowns -->
+                    <div class="col-md-4">
+                        <label class="form-label required">Model</label>
+                        <select id="id_edit_select_model" class="form-select">
+                            <option value="">Select a Model</option>
+                            <!-- Options will be populated dynamically -->
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label required">Dataset</label>
+                        <select id="id_edit_select_dataset" class="form-select">
+                            <option value="">Select a Dataset</option>
+                            <!-- Options will be populated dynamically -->
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label required">Optimization</label>
+                        <select id="id_edit_select_optimization" class="form-select">
+                            <option value="">Select an Optimization</option>
+                            <!-- Options will be populated dynamically -->
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Generate Engine Code Button in Edit Run Modal -->
+                <div class="mb-3">
+                    <button id="id_generate_edit_engine_code" type="button" class="btn btn-secondary" disabled>Generate Basic Engine Code</button>
+                </div>
+
+                <!-- Buttons moved above the editors -->
+                <div class="mb-3 d-flex justify-content-end">
+                    <button type="button" class="btn btn-link me-2" data-bs-dismiss="modal">Cancel</button>
+                    <button id="id_edit_run_ok" type="button" class="btn btn-primary">Save Changes</button>
+                </div>
+
+                <!-- Editor for engine.py -->
+                <div class="mb-3">
+                    <label class="form-label">Engine Code (engine.py)</label>
+                    <div class="editor" id="editor_edit_engine_py"></div>
+                </div>
+
+                <!-- Configuration (config.yaml) Editor -->
+                <div class="mb-3">
+                    <label class="form-label">Configuration (config.yaml)</label>
+                    <div id="editor_config_yaml_edit" class="editor"></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-link" data-bs-dismiss="modal">Cancel</button>
+                <button id="id_edit_run_ok" type="button" class="btn btn-primary">Save Changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .editor {
+        width: 100%;
+        height: 400px; /* Adjust as needed */
+    }
+    .form-control-plaintext {
+        font-weight: bold;
+    }
+    #logs_content {
+        white-space: pre-wrap; /* Preserve whitespace and wrap lines */
+        word-wrap: break-word; /* Break long words to prevent overflow */
+    }
+</style>
+
+<!-- Include the runs.js script -->
+<script src="/static/src/runs.js"></script>
+{% endblock %}
