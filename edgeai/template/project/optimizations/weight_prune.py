@@ -2,7 +2,7 @@ import torch.nn as nn
 import torch.nn.utils.prune as prune
 
 
-class WeightPruning:
+class Optimizer:
     def __init__(self, model, amount=0.2):
         """
         Initializes weight pruning for the given model.
