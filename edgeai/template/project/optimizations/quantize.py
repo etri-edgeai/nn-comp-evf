@@ -15,6 +15,12 @@ import torch.quantization as quantization
 def convert_to_16bit(model):
     """
     Converts the given model to 16-bit precision.
+
+    Parameters:
+    model (torch.nn.Module): The original PyTorch model to be quantized.
+
+    Returns:
+    torch.nn.Module: The quantized model in 16-bit precision.
     """
     return model.half()
 
