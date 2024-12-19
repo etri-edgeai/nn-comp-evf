@@ -19,3 +19,13 @@ class Optimizer:
         """
         # Placeholder - currently, just returns the original model unchanged.
         return self.model
+    
+    def prune(self):
+        """
+        Applies pruning to the model and returns the pruned model.
+        
+        Returns:
+        torch.nn.Module: The pruned model.
+        """
+        # Placeholder - currently, just returns the original model unchanged.
+        return self.model
