@@ -5,7 +5,13 @@ import torch.nn.utils.prune as prune
 
 class Sparsify:
     def __init__(self, model, sparsity=0.5):
+        """
+        Initializes the sparsification process.
 
+        Parameters:
+        model (torch.nn.Module): The PyTorch model.
+        sparsity (float): The target sparsity level (default is 0.5).
+        """
         self.model = model
         self.sparsity = sparsity
 
