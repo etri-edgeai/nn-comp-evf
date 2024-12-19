@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="page-wrapper">
+    <div class="container-fluid py-4">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h3 class="card-title">Datasets</h3>
+                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#id_modal_create_dataset">Create Dataset</button>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                        <tr>
+                            <th style="width: 30px;"></th>
+                            <th>NAME</th>
+                            <th>DATASET_PATH</th>
+                            <th>SHAPE</th>
+                            <th>MODE</th>
+                            <th>ACTIONS</th>
+                        </tr>
+                        </thead>
+                        <tbody id="id_table_body_datasets">
+                        <!-- Dataset items will be dynamically populated here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Create Dataset Modal -->
+<div class="modal modal-blur fade" id="id_modal_create_dataset" tabindex="-1">
+    <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Create Dataset</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label required">Dataset Name</label>
+                        <input id="id_dataset_name" type="text" class="form-control" placeholder="Enter dataset name" autocomplete="off">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label required">Dataset Path</label>
+                        <input id="id_dataset_path" type="text" class="form-control" placeholder="Enter dataset path" autocomplete="off">
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label required">Shape</label>
+                        <input id="id_dataset_shape" type="text" class="form-control" placeholder="e.g., (224, 224, 3)" autocomplete="off">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label required">Mode</label>
+                        <select id="id_dataset_mode" class="form-select">
+                            <option value="train">Train</option>
+                            <option value="val">Validation</option>
+                            <option value="test">Test</option>
+                        </select>
+                    </div>
+                </div>
+                <ul class="nav nav-tabs" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active" data-bs-toggle="tab" href="#tab_config_yaml" role="tab">config.yaml</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-bs-toggle="tab" href="#tab_dataset_py" role="tab">dataset.py</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-bs-toggle="tab" href="#tab_collate_fn_py" role="tab">collate_fn.py</a>
+                    </li>
+                </ul>
+                <div class="tab-content mt-3" style="max-height: 400px; overflow-y: auto;">
+                    <div class="tab-pane fade show active" id="tab_config_yaml" role="tabpanel">
+                        <div id="editor_config_yaml" class="editor"></div>
+                    </div>
+                    <div class="tab-pane fade" id="tab_dataset_py" role="tabpanel">
+                        <div id="editor_dataset_py" class="editor"></div>
+                    </div>
+                    <div class="tab-pane fade" id="tab_collate_fn_py" role="tabpanel">
+                        <div id="editor_collate_fn_py" class="editor"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-link link-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="id_create_dataset_ok">Create Dataset</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Notification Container -->
+<div id="notification-container" class="position-fixed bottom-0 end-0 p-3" style="z-index: 1050"></div>
+
+<script src="/static/src/datasets.js"></script>
+<style>
+    .drag-handle {
+        cursor: move;
+        color: #adb5bd;
+        padding: 0.5rem;
+        text-align: center;
+    }
+    .drag-handle:hover {
+        color: #6c757d;
+    }
+    .drag-over {
+        border: 2px dashed #0d6efd;
+    }
+    tr[draggable="true"] {
+        cursor: move;
+    }
+    .table > tbody > tr > td {
+        vertical-align: middle;
+    }
+</style>
+{% endblock %}
