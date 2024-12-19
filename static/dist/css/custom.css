@@ -1,0 +1,135 @@
+/* Dark theme colors */
+:root {
+    --navbar-dark-bg: #1a2234;
+    --sidebar-dark-bg: #1d273b;
+    --dark-text: rgba(255, 255, 255, 0.7);
+}
+
+/* Layout styles */
+.layout-fluid .page {
+    max-width: none;
+}
+
+/* Navbar & Sidebar */
+.navbar-vertical {
+    background: var(--navbar-dark-bg);
+}
+
+.navbar-vertical.navbar-dark {
+    border-right: 1px solid rgba(255,255,255,0.1);
+}
+
+/* Project selector styling */
+.project-selector {
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    position: relative;
+    z-index: 1030;
+}
+
+#id_project {
+    width: 100%;
+    background-color: rgba(255, 255, 255, 0.1);
+    color: white !important;
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 4px;
+    padding: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+#id_project option {
+    background-color: var(--sidebar-dark-bg);
+    color: var(--dark-text);
+    padding: 0.5rem;
+}
+
+/* Project actions */
+.project-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.project-actions .text-muted {
+    color: var(--dark-text) !important;
+}
+
+.project-actions .btn-sm {
+    padding: 0.25rem 0.5rem;
+    line-height: 1;
+}
+
+/* Modal improvements */
+.modal-content {
+    background-color: var(--navbar-dark-bg);
+    color: white;
+}
+
+.modal-header {
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.modal-footer {
+    border-top: 1px solid rgba(255,255,255,0.1);
+}
+
+.modal .btn-close {
+    filter: invert(1) grayscale(100%) brightness(200%);
+}
+
+/* Form elements in dark theme */
+.form-control, .form-select {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.2);
+    color: white;
+}
+
+.form-control:focus, .form-select:focus {
+    background-color: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.3);
+    color: white;
+}
+
+/* Notification styling */
+.notifyjs-corner {
+    z-index: 9999 !important;
+}
+
+.notifyjs-bootstrap-base {
+    padding: 0.75rem 1.25rem;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+/* Loading indicator */
+.loading-indicator {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+}
+
+/* User menu */
+.avatar {
+    background-color: #206bc4;
+}
+
+/* Responsive adjustments */
+@media (max-width: 992px) {
+    .navbar-vertical.navbar-expand-lg {
+        margin-left: -100%;
+        transition: margin 0.3s ease;
+    }
+
+    .navbar-vertical.navbar-expand-lg.show {
+        margin-left: 0;
+    }
+}
