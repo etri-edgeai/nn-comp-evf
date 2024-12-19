@@ -1,6 +1,24 @@
 import torch
 import torch.nn.functional as F
 
+def kd_loss(student_logits, teacher_logits, labels, temperature=2.0, alpha=0.5):
+    """
+    Compute the combined KD loss (hard labels + soft targets).
+    
+    Parameters:
+    student_logits (torch.Tensor): Logits from the student model.
+    teacher_logits (torch.Tensor): Logits from the teacher model.
+    labels (torch.Tensor): Ground truth labels.
+    temperature (float): Temperature for scaling logits.
+    alpha (float): Weight for the soft target loss.
+
+    Returns:
+    torch.Tensor: The total KD loss.
+    """
+    hard_loss = F.cross_entropy(student_logits, labels)
+    soft_loss = soft_targets_loss(student_logits, teacher_logits, temperature)
+    return alpha * soft_loss + (1.0 - alpha) * hard_loss
+
 
 def soft_targets_loss(student_logits, teacher_logits, temperature=2.0):
     """
