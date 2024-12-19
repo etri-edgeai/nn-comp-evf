@@ -11,6 +11,9 @@ Additionally, `QuantizationAwareTraining` class is provided to perform Quantizat
 import torch
 import torch.nn as nn
 import torch.quantization as quantization
+import logging
+
+logging.basicConfig(level=logging.INFO)
 
 def convert_to_16bit(model):
     """
