@@ -1,6 +1,20 @@
 import torch
 import torch.nn.functional as F
 
+def temperature_scale(logits, temperature=2.0):
+    """
+    Scale logits by the given temperature.
+
+    Parameters:
+    logits (torch.Tensor): Model logits.
+    temperature (float): Temperature for scaling.
+
+    Returns:
+    torch.Tensor: Scaled logits.
+    """
+    return logits / temperature
+
+
 def kd_loss(student_logits, teacher_logits, labels, temperature=2.0, alpha=0.5):
     """
     Compute the combined KD loss (hard labels + soft targets).
