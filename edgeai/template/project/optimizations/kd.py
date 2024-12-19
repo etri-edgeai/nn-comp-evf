@@ -50,7 +50,7 @@ def soft_targets_loss(student_logits, teacher_logits, temperature=2.0):
     student_log_probs = F.log_softmax(student_logits / temperature, dim=1)
     return F.kl_div(student_log_probs, teacher_probs, reduction='batchmean') * (temperature ** 2)
 
-class KnowledgeDistillation:
+class Optimizer:
     def __init__(self, teacher, student, temperature=2.0, alpha=0.5):
         """
         Initializes knowledge distillation between teacher and student models.
