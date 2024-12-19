@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="page-wrapper">
+    <div class="container-fluid py-4">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h3 class="card-title">Optimizations</h3>
+                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#id_modal_create_optimization">Create Optimization</button>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                        <tr>
+                            <th>Original Model Name</th>
+                            <th>Optimize Method Name</th>
+                            <th>Misc</th>
+                            <th>ACTIONS</th>
+                        </tr>
+                        </thead>
+                        <tbody id="id_table_body_optimizations">
+                        <!-- Optimization items will be dynamically populated here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Create Optimization Modal -->
+<div class="modal modal-blur fade" id="id_modal_create_optimization" tabindex="-1">
+    <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Create Optimization</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Form Fields -->
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label required">Original Model Name</label>
+                        <select id="id_original_model_name" class="form-select">
+                            <!-- Options will be populated dynamically -->
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label required">Optimize Method Name</label>
+                        <input id="id_optimize_method_name" type="text" class="form-control" placeholder="Enter optimize method name" autocomplete="off">
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-12">
+                        <label class="form-label required">Optimization Template</label>
+                        <select id="id_optimization_template" class="form-select">
+                            <!-- Options will be populated dynamically -->
+                        </select>
+                    </div>
+                </div>
+                <!-- Ace Editor -->
+                <div class="mt-3">
+                    <label class="form-label">optimize.py</label>
+                    <div id="editor_optimize_py" class="editor"></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-link link-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="id_create_optimization_ok">Create Optimization</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Include optimize.js -->
+<script src="/static/src/optimize.js"></script>
+{% endblock %}
