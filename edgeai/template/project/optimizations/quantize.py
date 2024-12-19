@@ -26,6 +26,9 @@ def convert_to_16bit(model):
 
 
 class Optimizer:
+    """
+    Handles 16-bit quantization for models.
+    """
     def __init__(self, model):
         self.model = model
 
