@@ -24,6 +24,18 @@ def convert_to_16bit(model):
     """
     return model.half()
 
+def convert_to_8bit(model):
+    """
+    Converts the given model to 8-bit precision dynamically.
+
+    Parameters:
+    model (torch.nn.Module): The original PyTorch model.
+
+    Returns:
+    torch.nn.Module: The quantized model in 8-bit precision.
+    """
+    return quantization.quantize_dynamic(model, {nn.Linear}, dtype=torch.qint8)
+
 
 def validate_model(model):
     if not isinstance(model, nn.Module):
