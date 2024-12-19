@@ -2,6 +2,22 @@ import torch
 import torch.nn.functional as F
 
 
+def soft_targets_loss(student_logits, teacher_logits, temperature=2.0):
+    """
+    Compute the soft target loss for knowledge distillation.
+    
+    Parameters:
+    student_logits (torch.Tensor): Logits from the student model.
+    teacher_logits (torch.Tensor): Logits from the teacher model.
+    temperature (float): Temperature for scaling logits.
+
+    Returns:
+    torch.Tensor: The KL divergence loss.
+    """
+    teacher_probs = F.softmax(teacher_logits / temperature, dim=1)
+    student_log_probs = F.log_softmax(student_logits / temperature, dim=1)
+    return F.kl_div(student_log_probs, teacher_probs, reduction='batchmean') * (temperature ** 2)
+
 class KnowledgeDistillation:
     def __init__(self, teacher, student, temperature=2.0, alpha=0.5):
         """
