@@ -10,6 +10,7 @@ from datasets import dataset
 from optimize import optimizations  # Correct the import to match the Blueprint name
 from monitor import monitor_bp
 
+
 app = Flask(__name__, static_url_path='/static')
 app.register_blueprint(auth, url_prefix='/auth')
 
