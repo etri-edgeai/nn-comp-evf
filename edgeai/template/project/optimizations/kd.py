@@ -10,6 +10,12 @@ class KnowledgeDistillation:
         self.alpha = alpha
 
     def loss_fn(self, teacher_logits, student_logits, target):
+        """
+        Computes the distillation loss.
+
+        Returns:
+        torch.Tensor: Combined loss.
+        """
         distillation_loss = F.kl_div(
             F.log_softmax(student_logits / self.temperature, dim=1),
             F.softmax(teacher_logits / self.temperature, dim=1),
