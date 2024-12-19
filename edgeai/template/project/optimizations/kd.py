@@ -4,6 +4,15 @@ import torch.nn.functional as F
 
 class KnowledgeDistillation:
     def __init__(self, teacher, student, temperature=2.0, alpha=0.5):
+        """
+        Initializes knowledge distillation between teacher and student models.
+
+        Parameters:
+        teacher (torch.nn.Module): The pre-trained teacher model.
+        student (torch.nn.Module): The student model to be trained.
+        temperature (float): The temperature for distillation (default is 2.0).
+        alpha (float): The weight for the distillation loss (default is 0.5).
+        """
         self.teacher = teacher
         self.student = student
         self.temperature = temperature
