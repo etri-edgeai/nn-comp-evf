@@ -25,6 +25,11 @@ def convert_to_16bit(model):
     return model.half()
 
 
+def validate_model(model):
+    if not isinstance(model, nn.Module):
+        raise TypeError("The model must be an instance of torch.nn.Module.")
+
+
 class Optimizer:
     """
     Handles 16-bit quantization for models.
