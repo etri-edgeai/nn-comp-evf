@@ -85,3 +85,20 @@ class QuantizationAwareTraining:
         """
         self.model.eval()
         return quantization.convert(self.model.eval(), inplace=False)
+    
+def main():
+    # Example PyTorch model
+    model = nn.Sequential(nn.Linear(10, 10), nn.ReLU(), nn.Linear(10, 5))
+
+    # Apply 16-bit quantization
+    optimizer = Optimizer(model)
+    quantized_model = optimizer.quantize()
+    print("16-bit Quantized Model:", quantized_model)
+
+    # Apply QAT
+    qat = QuantizationAwareTraining(model)
+    trained_model = qat.quantize()
+    print("QAT Quantized Model:", trained_model)
+
+if __name__ == "__main__":
+    main()
