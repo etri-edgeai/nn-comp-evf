@@ -137,7 +137,7 @@ model:
 
     // Function to fetch and populate dropdowns
     function loadDropdowns(selectModelId, selectDatasetId, selectOptimizationId) {
-        console.log(`Loading dropdowns: Model (${selectModelId}), Dataset (${selectDatasetId}), Optimization (${selectOptimizationId})`);
+        console.log(`Loading dropdowns: Model (${selectModelId}), Dataset (${selectDatasetId}), Optimizations (${selectOptimizationId})`);
         const projectName = sessionStorage.getItem('project_name');
         const payload = { project_name: projectName };
 
@@ -312,7 +312,7 @@ model:
             let dynamicImports = `
 from model.${modelName}.model import Model as _Model
 from dataset.${datasetName}.datasets import Dataset as _Dataset
-from optimization.${optimizationName}.optimize import Optimizer as _Optimization
+from optimizations.${optimizationName}.optimize import Optimizer as _Optimization
             `;
 
             // Set CUDA device based on number of GPUs
@@ -404,7 +404,7 @@ model:
             let dynamicImports = `
 from model.${modelName}.model import Model as _Model
 from dataset.${datasetName}.datasets import Dataset as _Dataset
-from optimization.${optimizationName}.optimize import Optimizer as _Optimization
+from optimizations.${optimizationName}.optimize import Optimizer as _Optimization
             `;
 
             // Set CUDA device based on number of GPUs
