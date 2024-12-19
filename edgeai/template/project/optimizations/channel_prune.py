@@ -34,3 +34,15 @@ class Optimizer:
             if isinstance(module, nn.Conv2d):
                 prune.ln_structured(module, name='weight', amount=self.amount, n=2, dim=0)
         return self.model
+    
+    def unprune(self):
+        """
+        Removes pruning from all pruned layers in the model.
+
+        Returns:
+        torch.nn.Module: The unpruned model.
+        """
+        for module_name, module in self.model.named_modules():
+            if isinstance(module, nn.Conv2d) and hasattr(module, 'weight_mask'):
+                prune.remove(module, 'weight')
+        return self.model
