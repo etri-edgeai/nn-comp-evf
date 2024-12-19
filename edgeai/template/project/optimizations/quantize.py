@@ -34,9 +34,6 @@ class QuantizationAwareTraining:
     def __init__(self, model):
         """
         Initializes the QAT process with the given model.
-
-        Parameters:
-        model (torch.nn.Module): The original PyTorch model to be quantized during training.
         """
         self.model = model
         self.model.train()
@@ -48,12 +45,7 @@ class QuantizationAwareTraining:
 
     def quantize(self):
         """
-        Converts the model to a quantized version after QAT is performed.
-
-        Returns:
-        torch.nn.Module: The quantized model ready for inference.
+        Converts the model to a quantized version after QAT.
         """
-        # Convert to quantized version for inference
         self.model.eval()
-        quantized_model = quantization.convert(self.model.eval(), inplace=False)
-        return quantized_model
+        return quantization.convert(self.model.eval(), inplace=False)
