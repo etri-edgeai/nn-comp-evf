@@ -404,7 +404,7 @@ model:
             let dynamicImports = `
 from model.${modelName}.model import Model as _Model
 from dataset.${datasetName}.datasets import Dataset as _Dataset
-from optimization.${optimizationName}.optimize import Optimizer as _Optimization
+from optimizations.${optimizationName}.optimize import Optimizer as _Optimization
             `;
 
             // Set CUDA device based on number of GPUs
