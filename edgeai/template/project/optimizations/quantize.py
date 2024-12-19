@@ -38,7 +38,10 @@ class Optimizer:
 
     def quantize(self):
         """
-        Applies 16-bit quantization.
+        Applies 16-bit quantization and returns the model.
+
+        Returns:
+        torch.nn.Module: The quantized model.
         """
         self.model = convert_to_16bit(self.model)
         return self.model
