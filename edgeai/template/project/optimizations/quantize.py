@@ -15,31 +15,17 @@ import torch.quantization as quantization
 def convert_to_16bit(model):
     """
     Converts the given model to 16-bit precision.
-
-    Parameters:
-    model (torch.nn.Module): The original PyTorch model to be quantized.
-
-    Returns:
-    torch.nn.Module: The quantized model in 16-bit precision.
     """
     return model.half()
 
+
 class Optimizer:
     def __init__(self, model):
-        """
-        Initializes the quantizer with the given model.
-
-        Parameters:
-        model (torch.nn.Module): The original PyTorch model to be quantized.
-        """
         self.model = model
 
     def quantize(self):
         """
-        Applies 16-bit quantization to the model and returns the quantized model.
-
-        Returns:
-        torch.nn.Module: The quantized model in 16-bit precision.
+        Applies 16-bit quantization.
         """
         self.model = convert_to_16bit(self.model)
         return self.model
