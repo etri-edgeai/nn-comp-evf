@@ -30,6 +30,10 @@ class Optimizer:
     Handles 16-bit quantization for models.
     """
     def __init__(self, model):
+        """
+        Parameters:
+        model (torch.nn.Module): The original PyTorch model to be quantized.
+        """
         self.model = model
 
     def quantize(self):
