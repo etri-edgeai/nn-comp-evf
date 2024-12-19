@@ -12,6 +12,18 @@ import torch.nn as nn
 import torch.nn.utils.prune as prune
 
 class Optimizer:
+    """
+    Optimizer class for channel pruning of convolutional layers.
+
+    Example:
+    --------
+    >>> import torch.nn as nn
+    >>> from channel_prune import Optimizer
+    >>> model = nn.Sequential(nn.Conv2d(3, 16, 3), nn.ReLU(), nn.Conv2d(16, 32, 3))
+    >>> optimizer = Optimizer(model, amount=0.3)
+    >>> pruned_model = optimizer.prune()
+    >>> print(pruned_model)
+    """
     def __init__(self, model, amount=0.2):
         """
         Initializes the channel pruning process with the given model.
