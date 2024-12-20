@@ -38,27 +38,24 @@ def session_required(func):
 
     return check_session
 
+@auth.route('/signin', methods=['GET'])
+def signin_form():
+    # Render the sign-in page
+    return render_template('sign-in.html')
 
 @auth.route('/signin', methods=['POST'])
 def signin():
-    try:
-        user = request.form.get('user')
-        password = request.form.get('password')
+    # Handle sign-in logic
+    user = request.form.get('user')
+    password = request.form.get('password')
 
-        if user not in db_users:
-            flash('user not found')
-            return render_template('sign-in.html', user=user)
-
-        if db_users[user] != password:
-            flash('password is wrong')
-            return render_template('sign-in.html', user=user)
-
+    # Logic for authentication
+    if user in db_users and db_users[user] == password:
         session['user'] = user
-
-    except Exception as e:
-        flash(e)
-
-    return redirect(url_for('root'))
+        return redirect(url_for('root'))
+    else:
+        flash('Invalid username or password')
+        return render_template('sign-in.html', user=user)
 
 
 @auth.route('/signup')
@@ -108,16 +105,8 @@ def signup_post():
 @auth.route('/logout', methods=['POST'])
 @login_required
 def logout():
-    msg = {
-        'err': None,
-        'res': {}
-    }
-
     try:
-        session.pop('user', None)
-        # session.clear()
-
+        session.pop('user', None)  # Remove user from session
+        return jsonify({'err': None, 'res': {'redirect_url': url_for('auth.signin')}})
     except Exception as e:
-        msg['err'] = str(e)
-
-    return jsonify(msg)
+        return jsonify({'err': str(e), 'res': {}})
