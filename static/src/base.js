@@ -141,6 +141,27 @@ const App = (function() {
         }
     };
 
+    document.getElementById('id_logout_ok').addEventListener('click', async function () {
+        try {
+            const response = await fetch('/auth/logout', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' }
+            });
+    
+            const data = await response.json();
+            if (!data.err) {
+                toastr.success("Logged out successfully.");
+                window.location.href = data.res.redirect_url; // Redirect to the sign-in page
+            } else {
+                toastr.error("Failed to logout: " + data.err);
+            }
+        } catch (error) {
+            console.error("Logout error:", error);
+            toastr.error("An error occurred during logout.");
+        }
+    });
+    
+
     // UI Management
     const UIManager = {
         updateProjectList(projects) {
