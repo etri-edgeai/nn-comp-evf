@@ -451,77 +451,81 @@ def delete_run():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-# Edit a run
 @runs.route('/edit', methods=['POST'])
 @session_required
 def edit_run():
     try:
         data = request.get_json()
-        project_name = data.get("project_name")
-        original_run_name = data.get("original_run_name")
-        run_name = data.get("run_name")
-        model_name = data.get("model_name")
-        dataset_name = data.get("dataset_name")
-        optimization_name = data.get("optimization_name")
-        num_gpus = data.get("num_gpus", 1)
-        misc = data.get("misc", {})
-        engine_py_content = data.get("engine_py")
+        project_name        = data.get("project_name")
+        original_run_name   = data.get("original_run_name")
+        run_name            = data.get("run_name")
+        model_name          = data.get("model_name")
+        dataset_name        = data.get("dataset_name")
+        optimization_name   = data.get("optimization_name")
+        num_gpus            = data.get("num_gpus", 1)
+        engine_py_content   = data.get("engine_py")
         config_yaml_content = data.get("config_yaml")
 
-        if not all([project_name, original_run_name, run_name, model_name, dataset_name, optimization_name]):
-            raise ValueError("Missing required fields.")
+        if not all([project_name, original_run_name, run_name]):
+            raise ValueError("Missing required fields: project_name, original_run_name, or run_name")
 
         user = session["user"]
         workspace_dir = os.path.join('workspace', user, project_name)
-        runs_dir = os.path.join(workspace_dir, 'runs', original_run_name)
-
-        if not os.path.exists(runs_dir):
-            return jsonify({"error": f"Run '{original_run_name}' does not exist."}), 404
-
         project_json_path = os.path.join(workspace_dir, 'project.json')
         if not os.path.exists(project_json_path):
             return jsonify({"error": "Project not found."}), 404
 
+        # Load project.json
         with open(project_json_path, 'r') as f:
             project_data = json.load(f)
 
-        # Find the run
+        # Find the run in project.json by original_run_name
         run = next((r for r in project_data.get("runs", []) if r["run_name"] == original_run_name), None)
         if not run:
-            return jsonify({"error": f"Run '{original_run_name}' not found."}), 404
+            return jsonify({"error": f"Run '{original_run_name}' not found in project.json."}), 404
 
-        # If run name is changed, rename the directory
+        old_runs_dir = os.path.join(workspace_dir, 'runs', original_run_name)
+        if not os.path.exists(old_runs_dir):
+            return jsonify({"error": f"Run directory for '{original_run_name}' does not exist."}), 404
+
+        # If run name changed, rename the folder + update the run_name in project.json
         if original_run_name != run_name:
             new_runs_dir = os.path.join(workspace_dir, 'runs', run_name)
             if os.path.exists(new_runs_dir):
-                return jsonify({"error": f"Run name '{run_name}' already exists."}), 400
-            os.rename(runs_dir, new_runs_dir)
+                return jsonify({"error": f"Run '{run_name}' already exists."}), 400
+
+            os.rename(old_runs_dir, new_runs_dir)
             run["run_name"] = run_name
-            run["engine_path"] = os.path.abspath(os.path.join(new_runs_dir, 'engine.py'))
-            run["status"] = "Not Running"
-            run["gpu_ids"] = []
-            runs_dir = new_runs_dir  # Update runs_dir
+            old_runs_dir = new_runs_dir  # from now on we use the new name
 
-        # Update other run details
-        run["model_name"] = model_name
-        run["dataset_name"] = dataset_name
-        run["optimization_name"] = optimization_name
-        run["num_gpus"] = num_gpus
-        run["misc"] = misc
+        runs_dir = os.path.join(workspace_dir, 'runs', run_name)
+        if not os.path.exists(runs_dir):
+            return jsonify({"error": f"Run directory for '{run_name}' does not exist."}), 404
 
-        # Save updated engine.py
-        engine_py_path = os.path.join(runs_dir, 'engine.py')
-        with open(engine_py_path, 'w') as f:
-            f.write(engine_py_content)
+        # Update metadata in run
+        if model_name is not None:
+            run["model_name"] = model_name
+        if dataset_name is not None:
+            run["dataset_name"] = dataset_name
+        if optimization_name is not None:
+            run["optimization_name"] = optimization_name
+        if num_gpus is not None:
+            run["num_gpus"] = num_gpus
 
-        # Save updated config.yaml if provided
-        if config_yaml_content:
+        # Overwrite engine.py if provided
+        if engine_py_content is not None:
+            engine_py_path = os.path.join(runs_dir, 'engine.py')
+            with open(engine_py_path, 'w') as f:
+                f.write(engine_py_content)
+
+        # Overwrite config.yaml if provided
+        if config_yaml_content is not None:
             config_yaml_path = os.path.join(runs_dir, 'config.yaml')
             with open(config_yaml_path, 'w') as f:
                 f.write(config_yaml_content)
 
-        # If the run is running, stop it before applying changes
-        if run["status"] == "Running":
+        # If the run is currently running, optionally stop it so changes take effect
+        if run.get("status") == "Running":
             pid = run.get("pid")
             gpu_ids = run.get("gpu_ids", [])
             if pid:
@@ -537,7 +541,7 @@ def edit_run():
                 except Exception as e:
                     return jsonify({"error": f"Failed to terminate process with PID {pid}: {str(e)}"}), 500
 
-        # Save project.json
+        # Save updated project.json
         with open(project_json_path, 'w') as f:
             json.dump(project_data, f, indent=4)
 
@@ -545,3 +549,5 @@ def edit_run():
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+
