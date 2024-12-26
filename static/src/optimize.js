@@ -38,7 +38,13 @@ $(document).ready(function () {
             const response = await fetch(`/optimizations/save_edit`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-
+                body: JSON.stringify({
+                    project_name: sessionStorage.getItem('project_name'),
+                    optimize_method_name: optimizeMethodName,
+                    original_model_name: originalModelName, // if needed
+                    edited_code: editedCode
+                })
+                });
 
     // When the modal is hidden, clear the editor and reset form fields
     $('#id_modal_create_optimization').on('hidden.bs.modal', function () {
