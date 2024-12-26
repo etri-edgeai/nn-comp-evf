@@ -141,7 +141,10 @@ def save_edit():
         if not (project_name and optimize_method_name and edited_code is not None):
             raise ValueError("Missing required parameters for saving optimization edit")
 
-
+        # Path to the existing optimization folder
+        user_path = os.path.join(
+            '.', 'workspace', session["user"], project_name, 'optimizations', optimize_method_name
+        )
 
 
 
