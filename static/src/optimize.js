@@ -198,7 +198,9 @@ $(document).ready(function () {
             toastr.error('Failed to save the new order', "Error");
         }
     }
-
+    function updateOptimizationTable(optimizations) {
+        const $tableBody = $('#id_table_body_optimizations');
+        $tableBody.empty();
 
     // Function to Load Template Options
     async function loadTemplateOptions() {
