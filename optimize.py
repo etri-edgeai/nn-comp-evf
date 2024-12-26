@@ -39,14 +39,13 @@ def reorder_optimizations():
 
         if not all([project_name, new_order]):
             raise ValueError("Missing required parameters")
-        
+
         project_json_path = os.path.join(
             './workspace', session["user"], project_name, 'project.json'
         )
 
         if not os.path.exists(project_json_path):
             raise FileNotFoundError("Project configuration not found")
-        
 
         # Read current project data
         with open(project_json_path, 'r') as f:
