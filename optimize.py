@@ -101,6 +101,10 @@ def get_optimization():
         user_path = os.path.join(
             '.', 'workspace', session["user"], project_name, 'optimizations', optimize_method_name
         )
+        # 1) Load meta.json to get original_model_name, etc.
+        meta_path = os.path.join(user_path, 'meta.json')
+        if not os.path.exists(meta_path):
+            raise FileNotFoundError(f"meta.json not found for optimization '{optimize_method_name}'")
 
 
 
