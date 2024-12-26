@@ -135,42 +135,42 @@ $(document).ready(function () {
                 e.dataTransfer.effectAllowed = 'move';
             });
 
-        row.addEventListener('dragend', function () {
-            this.style.opacity = '1';
-            rows.forEach(row => row.classList.remove('drag-over'));
+            row.addEventListener('dragend', function () {
+                this.style.opacity = '1';
+                rows.forEach(row => row.classList.remove('drag-over'));
+            });
+
+            row.addEventListener('dragover', function (e) {
+                e.preventDefault();
+                e.dataTransfer.dropEffect = 'move';
+            });
+
+            row.addEventListener('dragenter', function () {
+                this.classList.add('drag-over');
+            });
+            
+            row.addEventListener('dragleave', function () {
+                this.classList.remove('drag-over');
+            });
+
+            row.addEventListener('drop', function (e) {
+                e.preventDefault();
+                if (this === draggedRow) return;
+
+                const allRows = [...rows];
+                const draggedIndex = allRows.indexOf(draggedRow);
+                const droppedIndex = allRows.indexOf(this);
+
+                if (draggedIndex < droppedIndex) {
+                    this.parentNode.insertBefore(draggedRow, this.nextSibling);
+                } else {
+                    this.parentNode.insertBefore(draggedRow, this);
+                }
+
+                saveOptimizationOrder();
+            });
         });
-
-        row.addEventListener('dragover', function (e) {
-            e.preventDefault();
-            e.dataTransfer.dropEffect = 'move';
-        });
-
-        row.addEventListener('dragenter', function () {
-            this.classList.add('drag-over');
-        });
-        
-        row.addEventListener('dragleave', function () {
-            this.classList.remove('drag-over');
-        });
-
-        row.addEventListener('drop', function (e) {
-            e.preventDefault();
-            if (this === draggedRow) return;
-
-            const allRows = [...rows];
-            const draggedIndex = allRows.indexOf(draggedRow);
-            const droppedIndex = allRows.indexOf(this);
-
-            if (draggedIndex < droppedIndex) {
-                this.parentNode.insertBefore(draggedRow, this.nextSibling);
-            } else {
-                this.parentNode.insertBefore(draggedRow, this);
-            }
-
-            saveOptimizationOrder();
-        });
-    });
-}
+    }
     // Function to Load Template Options
     async function loadTemplateOptions() {
         console.log('Loading template options...');
