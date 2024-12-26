@@ -26,7 +26,10 @@ $(document).ready(function () {
         $('#id_edit_original_model_name').val('');
       });
     
-
+    $('#id_edit_optimization_ok').click(async function () {
+        const optimizeMethodName = $('#id_edit_optimize_method_name').val();
+        const originalModelName  = $('#id_edit_original_model_name').val();
+        const editedCode         = editorOptimizePyEdit.getValue();
 
     // When the modal is hidden, clear the editor and reset form fields
     $('#id_modal_create_optimization').on('hidden.bs.modal', function () {
