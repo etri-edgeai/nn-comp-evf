@@ -63,7 +63,9 @@ def reorder_optimizations():
             json.dump(project_data, f, indent=4)
 
         return jsonify({"message": "Optimizations reordered successfully", "error": None})
-
+    except Exception as e:
+        print(f"Error in reorder_optimizations: {e}")
+        return jsonify({"error": str(e)})
 
 
 
