@@ -81,6 +81,16 @@ def load_template():
         print(f"Error in load_template: {e}")
         return jsonify({"error": str(e)})
 
+
+@optimizations.route('/get_optimization', methods=['POST'])
+@session_required
+def get_optimization():
+    """
+    Given an optimize_method_name, read 'optimize.py' from 
+    ./workspace/<user>/<project_name>/optimizations/<optimize_method_name>
+    and return the contents + metadata from meta.json.
+    """
+
 # Save a new optimization
 @optimizations.route('/save', methods=['POST'])
 @session_required
