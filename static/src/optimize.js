@@ -139,13 +139,15 @@ $(document).ready(function () {
             this.style.opacity = '1';
             rows.forEach(row => row.classList.remove('drag-over'));
         });
-        
+
         row.addEventListener('dragover', function (e) {
             e.preventDefault();
             e.dataTransfer.dropEffect = 'move';
         });
 
-
+        row.addEventListener('dragenter', function () {
+            this.classList.add('drag-over');
+        });
 
     // Function to Load Template Options
     async function loadTemplateOptions() {
