@@ -30,6 +30,8 @@ def get_templates():
 
 @optimizations.route('/reorder', methods=['POST'])
 @session_required
+def reorder_optimizations():
+    """Reorder optimizations in project.json."""
 
 
 # Load specific template content
