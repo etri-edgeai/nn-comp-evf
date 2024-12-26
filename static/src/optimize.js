@@ -57,7 +57,7 @@ $(document).ready(function () {
                 console.error("Error saving edited optimization:", error);
                 toastr.error("Failed to save optimization.", "Error");
             }
-
+        });
 
 
 
