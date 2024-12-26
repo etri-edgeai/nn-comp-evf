@@ -19,7 +19,8 @@ $(document).ready(function () {
     });
 
     let editorOptimizePyEdit = null;
-
+    $('#id_modal_edit_optimization').on('shown.bs.modal', function () {
+        if (!editorOptimizePyEdit) {
 
     $('#id_modal_edit_optimization').on('hidden.bs.modal', function () {
         if (editorOptimizePyEdit) {
