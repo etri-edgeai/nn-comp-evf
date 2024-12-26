@@ -34,6 +34,11 @@ $(document).ready(function () {
             toastr.error("No optimization is selected.", "Error");
             return;
         }
+        try {
+            const response = await fetch(`/optimizations/save_edit`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+
 
     // When the modal is hidden, clear the editor and reset form fields
     $('#id_modal_create_optimization').on('hidden.bs.modal', function () {
