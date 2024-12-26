@@ -59,6 +59,9 @@ def reorder_optimizations():
         project_data['optimizations'] = [optimization_map[name] for name in new_order if name in optimization_map]
 
 
+        # Save updated project.json
+        with open(project_json_path, 'w') as f:
+            json.dump(project_data, f, indent=4)
 
 # Load specific template content
 @optimizations.route('/load_template', methods=['POST'])
