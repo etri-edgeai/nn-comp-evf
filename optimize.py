@@ -137,6 +137,15 @@ def save_edit():
         project_name = data.get('project_name')
         optimize_method_name = data.get('optimize_method_name')
         edited_code = data.get('edited_code')
+        
+        if not (project_name and optimize_method_name and edited_code is not None):
+            raise ValueError("Missing required parameters for saving optimization edit")
+
+
+
+
+
+
 
 # Save a new optimization
 @optimizations.route('/save', methods=['POST'])
