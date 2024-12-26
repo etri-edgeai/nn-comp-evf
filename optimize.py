@@ -124,6 +124,13 @@ def get_optimization():
         })
     except Exception as e:
         return jsonify({"error": str(e)})
+    
+@optimizations.route('/save_edit', methods=['POST'])
+@session_required
+def save_edit():
+
+
+
 # Save a new optimization
 @optimizations.route('/save', methods=['POST'])
 @session_required
