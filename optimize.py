@@ -108,6 +108,11 @@ def get_optimization():
         with open(meta_path, 'r') as f:
           meta_data = json.load(f)
 
+        original_model_name = meta_data.get('original_model_name', '')
+        # 2) Load optimize.py
+        optimize_py_path = os.path.join(user_path, 'optimize.py')
+        if not os.path.isfile(optimize_py_path):
+            raise FileNotFoundError(f"optimize.py not found for optimization '{optimize_method_name}'")
 
 
 # Save a new optimization
