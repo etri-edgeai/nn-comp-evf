@@ -124,6 +124,12 @@ $(document).ready(function () {
         }
     }
 
+    function initOptimizationDragAndDrop() {
+        const rows = document.querySelectorAll('#id_table_body_optimizations tr');
+        let draggedRow = null;
+
+
+
     // Function to Load Template Options
     async function loadTemplateOptions() {
         console.log('Loading template options...');
