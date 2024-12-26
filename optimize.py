@@ -37,6 +37,8 @@ def reorder_optimizations():
         project_name = data.get('project_name')
         new_order = data.get('order')
 
+        if not all([project_name, new_order]):
+            raise ValueError("Missing required parameters")
 
 # Load specific template content
 @optimizations.route('/load_template', methods=['POST'])
