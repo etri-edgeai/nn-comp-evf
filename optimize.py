@@ -128,7 +128,10 @@ def get_optimization():
 @optimizations.route('/save_edit', methods=['POST'])
 @session_required
 def save_edit():
-
+    """
+    Given an optimize_method_name and edited_code, overwrite
+    the existing optimize.py with the new content.
+    """
 
 
 # Save a new optimization
