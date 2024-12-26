@@ -193,7 +193,11 @@ $(document).ready(function () {
             } else {
                 toastr.success(data.message, "Success");
             }
+        } catch (error) {
+            console.error('Failed to save new order:', error);
+            toastr.error('Failed to save the new order', "Error");
         }
+    }
 
 
     // Function to Load Template Options
