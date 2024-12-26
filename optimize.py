@@ -145,6 +145,7 @@ def save_edit():
         user_path = os.path.join(
             '.', 'workspace', session["user"], project_name, 'optimizations', optimize_method_name
         )
+        optimize_py_path = os.path.join(user_path, 'optimize.py')
 
 
 
