@@ -177,6 +177,23 @@ $(document).ready(function () {
         document.querySelectorAll('#id_table_body_optimizations tr').forEach(row => {
             newOrder.push(row.dataset.name); // Use the unique optimization name as an identifier
         });
+        try {
+            const response = await fetch('/optimizations/reorder', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    project_name: sessionStorage.getItem('project_name'),
+                    order: newOrder
+                })
+            });
+    
+            const data = await response.json();
+            if (data.error) {
+                toastr.error(data.error, "Error");
+            } else {
+                toastr.success(data.message, "Success");
+            }
+        }
 
 
     // Function to Load Template Options
