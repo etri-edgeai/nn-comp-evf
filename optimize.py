@@ -48,8 +48,11 @@ def reorder_optimizations():
             raise FileNotFoundError("Project configuration not found")
         
 
+        # Read current project data
+        with open(project_json_path, 'r') as f:
+            project_data = json.load(f)
 
-        
+
 # Load specific template content
 @optimizations.route('/load_template', methods=['POST'])
 @session_required
