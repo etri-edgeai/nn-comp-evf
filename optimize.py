@@ -96,6 +96,14 @@ def get_optimization():
         optimize_method_name = data.get('optimize_method_name')
         if not (project_name and optimize_method_name):
             raise ValueError("Missing required parameters")
+        
+        # Path to this optimization's folder
+        user_path = os.path.join(
+            '.', 'workspace', session["user"], project_name, 'optimizations', optimize_method_name
+        )
+
+
+
 # Save a new optimization
 @optimizations.route('/save', methods=['POST'])
 @session_required
