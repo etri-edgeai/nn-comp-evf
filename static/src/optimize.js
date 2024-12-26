@@ -59,8 +59,6 @@ $(document).ready(function () {
             }
         });
 
-
-
     // When the modal is hidden, clear the editor and reset form fields
     $('#id_modal_create_optimization').on('hidden.bs.modal', function () {
         $('#id_original_model_name').empty();
