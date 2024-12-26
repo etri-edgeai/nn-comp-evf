@@ -135,6 +135,11 @@ $(document).ready(function () {
                 e.dataTransfer.effectAllowed = 'move';
             });
 
+        row.addEventListener('dragend', function () {
+            this.style.opacity = '1';
+            rows.forEach(row => row.classList.remove('drag-over'));
+        });
+    
 
     // Function to Load Template Options
     async function loadTemplateOptions() {
