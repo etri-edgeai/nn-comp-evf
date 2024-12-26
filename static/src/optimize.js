@@ -48,6 +48,10 @@ $(document).ready(function () {
                 const data = await response.json();
                 if (data.error) {
                 toastr.error(data.error, "Error");
+                } else {
+                toastr.success("Optimization updated successfully!", "Success");
+                $('#id_modal_edit_optimization').modal('hide');
+                loadOptimizationList(); // refresh the table
                 }
     // When the modal is hidden, clear the editor and reset form fields
     $('#id_modal_create_optimization').on('hidden.bs.modal', function () {
