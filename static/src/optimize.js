@@ -24,9 +24,14 @@ $(document).ready(function () {
             editorOptimizePyEdit = ace.edit("editor_optimize_py_edit");
             editorOptimizePyEdit.setTheme("ace/theme/monokai");
             editorOptimizePyEdit.session.setMode("ace/mode/python");
+            editorOptimizePyEdit.setOptions({
+                maxLines: Infinity,
+                minLines: 30
+            });
+        }
+    });
 
 
-            
     $('#id_modal_edit_optimization').on('hidden.bs.modal', function () {
         if (editorOptimizePyEdit) {
           editorOptimizePyEdit.setValue('', -1);
