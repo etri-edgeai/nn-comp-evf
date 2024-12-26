@@ -363,8 +363,94 @@ model:
         generateEngineCodeCreate();
     });
     async function generateEngineCodeCreate() {
-        // your logic to fetch import.txt, engine.txt, etc.
-        // then editorEnginePy.setValue(...)
+        const modelName = $('#id_select_model').val();
+        const datasetName = $('#id_select_dataset').val();
+        const optimizationName = $('#id_select_optimization').val();
+        const numGpus = parseInt($('#id_num_gpus').val()) || 1;
+
+        console.log("Generating engine.py for Create Run with:", { modelName, datasetName, optimizationName, numGpus });
+
+        if (!modelName || !datasetName || !optimizationName || !numGpus) {
+            toastr.error("Please ensure all fields are selected.");
+            console.warn("Missing fields for engine.py generation.");
+            return;
+        }
+
+        try {
+            // Fetch import.txt
+            console.log("Fetching import.txt template.");
+            const importResponse = await fetch(`/runs/get_template?file=import.txt`);
+            if (!importResponse.ok) {
+                throw new Error("Failed to fetch import.txt");
+            }
+            const importText = await importResponse.text();
+
+            // Fetch engine.txt
+            console.log("Fetching engine.txt template.");
+            const engineResponse = await fetch(`/runs/get_template?file=engine.txt`);
+            if (!engineResponse.ok) {
+                throw new Error("Failed to fetch engine.txt");
+            }
+            const engineText = await engineResponse.text();
+
+            // Dynamic imports based on selections
+            let dynamicImports = `
+from model.${modelName}.model import Model as _Model
+from dataset.${datasetName}.datasets import Dataset as _Dataset
+from optimization.${optimizationName}.optimize import Optimizer as _Optimization
+            `;
+
+            // Set CUDA device based on number of GPUs
+            let cudaDevices = '';
+            for (let i = 0; i < numGpus; i++) {
+                cudaDevices += `${i}, `;
+            }
+            cudaDevices = cudaDevices.slice(0, -2); // Remove trailing comma and space
+
+            // Combine all parts
+            let finalCode = `${importText}
+
+${dynamicImports}
+
+# Set CUDA devices
+os.environ["CUDA_VISIBLE_DEVICES"] = "${cudaDevices}"
+${engineText}`;
+
+            editorEnginePy.setValue(finalCode.trim(), -1); // Insert code into editor
+            toastr.success("Engine code generated successfully.");
+            console.log("Engine code generated and inserted into editor.");
+
+            const defaultConfigYaml = `misc:
+  seed: 42
+  log_dir: ./logs
+  checkpoint_dir: ./checkpoints
+
+training:
+  epochs: 10
+  num_gpus: ${numGpus}
+  batch_size: 32
+  loss_function: CrossEntropyLoss
+
+optimization:
+  optimizer:
+    name: Adam
+    params:
+      lr: 0.001
+
+dataset:
+  name: ${datasetName}
+  params: {}
+
+model:
+  name: ${modelName}
+  params: {}
+`;
+            editorConfigYaml.setValue(defaultConfigYaml, -1);
+            console.log("Default config.yaml generated and inserted into editorConfigYaml.");
+        } catch (error) {
+            console.error("Error generating engine code:", error);
+            toastr.error("Failed to generate engine code.");
+        }
     }
 
     $('#id_generate_edit_engine_code').click(function () {
