@@ -30,6 +30,10 @@ $(document).ready(function () {
         const optimizeMethodName = $('#id_edit_optimize_method_name').val();
         const originalModelName  = $('#id_edit_original_model_name').val();
         const editedCode         = editorOptimizePyEdit.getValue();
+        if (!optimizeMethodName) {
+            toastr.error("No optimization is selected.", "Error");
+            return;
+        }
 
     // When the modal is hidden, clear the editor and reset form fields
     $('#id_modal_create_optimization').on('hidden.bs.modal', function () {
