@@ -39,6 +39,10 @@ def reorder_optimizations():
 
         if not all([project_name, new_order]):
             raise ValueError("Missing required parameters")
+        
+        project_json_path = os.path.join(
+            './workspace', session["user"], project_name, 'project.json'
+        )
 
 # Load specific template content
 @optimizations.route('/load_template', methods=['POST'])
