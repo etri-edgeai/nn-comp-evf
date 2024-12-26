@@ -152,7 +152,7 @@ $(document).ready(function () {
         row.addEventListener('dragleave', function () {
             this.classList.remove('drag-over');
         });
-        
+
         row.addEventListener('drop', function (e) {
             e.preventDefault();
             if (this === draggedRow) return;
@@ -169,7 +169,8 @@ $(document).ready(function () {
 
             saveOptimizationOrder();
         });
-
+    });
+}
     // Function to Load Template Options
     async function loadTemplateOptions() {
         console.log('Loading template options...');
