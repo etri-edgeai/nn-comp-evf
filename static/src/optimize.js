@@ -148,6 +148,11 @@ $(document).ready(function () {
         row.addEventListener('dragenter', function () {
             this.classList.add('drag-over');
         });
+        
+        row.addEventListener('dragleave', function () {
+            this.classList.remove('drag-over');
+        });
+
 
     // Function to Load Template Options
     async function loadTemplateOptions() {
