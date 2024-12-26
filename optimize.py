@@ -122,7 +122,8 @@ def get_optimization():
             "original_model_name": original_model_name,
             "optimization_code": optimization_code,
         })
-
+    except Exception as e:
+        return jsonify({"error": str(e)})
 # Save a new optimization
 @optimizations.route('/save', methods=['POST'])
 @session_required
