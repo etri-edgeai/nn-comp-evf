@@ -152,7 +152,23 @@ $(document).ready(function () {
         row.addEventListener('dragleave', function () {
             this.classList.remove('drag-over');
         });
+        
+        row.addEventListener('drop', function (e) {
+            e.preventDefault();
+            if (this === draggedRow) return;
 
+            const allRows = [...rows];
+            const draggedIndex = allRows.indexOf(draggedRow);
+            const droppedIndex = allRows.indexOf(this);
+
+            if (draggedIndex < droppedIndex) {
+                this.parentNode.insertBefore(draggedRow, this.nextSibling);
+            } else {
+                this.parentNode.insertBefore(draggedRow, this);
+            }
+
+            saveOptimizationOrder();
+        });
 
     // Function to Load Template Options
     async function loadTemplateOptions() {
