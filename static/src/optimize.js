@@ -201,7 +201,9 @@ $(document).ready(function () {
     function updateOptimizationTable(optimizations) {
         const $tableBody = $('#id_table_body_optimizations');
         $tableBody.empty();
-
+        if (optimizations.length === 0) {
+            $tableBody.append('<tr><td colspan="4" class="text-center">No optimizations available</td></tr>');
+        }
     // Function to Load Template Options
     async function loadTemplateOptions() {
         console.log('Loading template options...');
