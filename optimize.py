@@ -44,6 +44,12 @@ def reorder_optimizations():
             './workspace', session["user"], project_name, 'project.json'
         )
 
+        if not os.path.exists(project_json_path):
+            raise FileNotFoundError("Project configuration not found")
+        
+
+
+        
 # Load specific template content
 @optimizations.route('/load_template', methods=['POST'])
 @session_required
