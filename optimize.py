@@ -147,6 +147,8 @@ def save_edit():
         )
         optimize_py_path = os.path.join(user_path, 'optimize.py')
 
+        if not os.path.isfile(optimize_py_path):
+            raise FileNotFoundError(f"optimize.py not found at {optimize_py_path}")
 
 
 
