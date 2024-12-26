@@ -17,6 +17,16 @@ $(document).ready(function () {
         // Load templates into the dropdown
         loadTemplateOptions();
     });
+    
+    $('#id_modal_edit_optimization').on('hidden.bs.modal', function () {
+        if (editorOptimizePyEdit) {
+          editorOptimizePyEdit.setValue('', -1);
+        }
+        $('#id_edit_optimize_method_name').val('');
+        $('#id_edit_original_model_name').val('');
+      });
+    
+
 
     // When the modal is hidden, clear the editor and reset form fields
     $('#id_modal_create_optimization').on('hidden.bs.modal', function () {
@@ -38,6 +48,7 @@ $(document).ready(function () {
             editorOptimizePy.setValue('', -1);
         }
     });
+          
 
     // Handle Create Optimization Button Click
     $('#id_create_optimization_ok').click(async function () {
@@ -317,10 +328,39 @@ $(document).ready(function () {
     }
 
     // Handle Edit Optimization
-    window.editOptimization = function (optimizeMethodName) {
-        // TODO: Implement edit functionality
-        toastr.info("Edit functionality is not implemented yet.", "info");
-    };
+    window.editOptimization = async function (optimizeMethodName) {
+        try {
+          // 1) Fetch the existing optimization data (including code).
+          const response = await fetch(`/optimizations/get_optimization`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              project_name: sessionStorage.getItem('project_name'),
+              optimize_method_name: optimizeMethodName
+            })
+          });
+          const data = await response.json();
+          if (data.error) {
+            toastr.error(data.error, "Error");
+            return;
+          }
+      
+          // 2) Populate fields in the modal
+          $('#id_edit_optimize_method_name').val(data.optimize_method_name);
+          $('#id_edit_original_model_name').val(data.original_model_name);
+          if (editorOptimizePyEdit) {
+            editorOptimizePyEdit.setValue(data.optimization_code || '', -1);
+          }
+      
+          // 3) Show the modal
+          $('#id_modal_edit_optimization').modal('show');
+      
+        } catch (error) {
+          console.error("Error loading optimization for editing:", error);
+          toastr.error("Failed to load optimization.", "Error");
+        }
+      };
+      
 
     // Handle Delete Optimization
     window.deleteOptimization = async function (optimizeMethodName) {
