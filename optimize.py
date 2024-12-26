@@ -113,6 +113,9 @@ def get_optimization():
         optimize_py_path = os.path.join(user_path, 'optimize.py')
         if not os.path.isfile(optimize_py_path):
             raise FileNotFoundError(f"optimize.py not found for optimization '{optimize_method_name}'")
+        
+        with open(optimize_py_path, 'r', encoding='utf-8') as f:
+              optimization_code = f.read()
 
 
 # Save a new optimization
