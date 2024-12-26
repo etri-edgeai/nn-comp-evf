@@ -17,7 +17,10 @@ $(document).ready(function () {
         // Load templates into the dropdown
         loadTemplateOptions();
     });
-    
+
+    let editorOptimizePyEdit = null;
+
+
     $('#id_modal_edit_optimization').on('hidden.bs.modal', function () {
         if (editorOptimizePyEdit) {
           editorOptimizePyEdit.setValue('', -1);
