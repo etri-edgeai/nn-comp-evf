@@ -75,6 +75,30 @@
 </div>
 
 
+<style>
+    /* Add styles for drag-and-drop rows */
+    .drag-handle {
+        cursor: move;
+        color: #adb5bd;
+        text-align: center;
+    }
+
+    .drag-handle:hover {
+        color: #6c757d;
+    }
+
+    .drag-over {
+        border: 2px dashed #0d6efd;
+    }
+
+    tr[draggable="true"] {
+        cursor: move;
+    }
+
+    .table > tbody > tr > td {
+        vertical-align: middle;
+    }
+</style>
 <!-- Include optimize.js -->
 <script src="/static/src/optimize.js"></script>
 {% endblock %}
