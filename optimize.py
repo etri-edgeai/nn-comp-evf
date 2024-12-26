@@ -132,7 +132,11 @@ def save_edit():
     Given an optimize_method_name and edited_code, overwrite
     the existing optimize.py with the new content.
     """
-
+    try:
+        data = request.json
+        project_name = data.get('project_name')
+        optimize_method_name = data.get('optimize_method_name')
+        edited_code = data.get('edited_code')
 
 # Save a new optimization
 @optimizations.route('/save', methods=['POST'])
