@@ -156,8 +156,10 @@ def save_edit():
 
         # (Optionally, update meta.json if there's any change to original_model_name, etc.)
         # For example, if you want to store a new "timestamp" or something, do it here.
+        return jsonify({"message": "Optimization updated successfully"})
 
-
+    except Exception as e:
+        return jsonify({"error": str(e)})
 
 # Save a new optimization
 @optimizations.route('/save', methods=['POST'])
