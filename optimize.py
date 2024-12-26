@@ -117,6 +117,11 @@ def get_optimization():
         with open(optimize_py_path, 'r', encoding='utf-8') as f:
               optimization_code = f.read()
 
+        return jsonify({
+            "optimize_method_name": optimize_method_name,
+            "original_model_name": original_model_name,
+            "optimization_code": optimization_code,
+        })
 
 # Save a new optimization
 @optimizations.route('/save', methods=['POST'])
