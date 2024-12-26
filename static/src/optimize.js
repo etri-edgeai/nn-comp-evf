@@ -128,6 +128,12 @@ $(document).ready(function () {
         const rows = document.querySelectorAll('#id_table_body_optimizations tr');
         let draggedRow = null;
 
+        rows.forEach(row => {
+            row.addEventListener('dragstart', function (e) {
+                draggedRow = this;
+                this.style.opacity = '0.4';
+                e.dataTransfer.effectAllowed = 'move';
+            });
 
 
     // Function to Load Template Options
