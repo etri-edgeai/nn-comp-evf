@@ -21,7 +21,12 @@ $(document).ready(function () {
     let editorOptimizePyEdit = null;
     $('#id_modal_edit_optimization').on('shown.bs.modal', function () {
         if (!editorOptimizePyEdit) {
+            editorOptimizePyEdit = ace.edit("editor_optimize_py_edit");
+            editorOptimizePyEdit.setTheme("ace/theme/monokai");
+            editorOptimizePyEdit.session.setMode("ace/mode/python");
 
+
+            
     $('#id_modal_edit_optimization').on('hidden.bs.modal', function () {
         if (editorOptimizePyEdit) {
           editorOptimizePyEdit.setValue('', -1);
