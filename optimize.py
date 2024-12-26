@@ -28,6 +28,10 @@ def get_templates():
         print(f"Error in get_templates: {e}")
         return jsonify({"error": str(e)})
 
+@optimizations.route('/reorder', methods=['POST'])
+@session_required
+
+
 # Load specific template content
 @optimizations.route('/load_template', methods=['POST'])
 @session_required
