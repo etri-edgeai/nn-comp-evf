@@ -171,6 +171,14 @@ $(document).ready(function () {
             });
         });
     }
+
+    async function saveOptimizationOrder() {
+        const newOrder = [];
+        document.querySelectorAll('#id_table_body_optimizations tr').forEach(row => {
+            newOrder.push(row.dataset.name); // Use the unique optimization name as an identifier
+        });
+
+
     // Function to Load Template Options
     async function loadTemplateOptions() {
         console.log('Loading template options...');
