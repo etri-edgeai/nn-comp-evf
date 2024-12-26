@@ -203,7 +203,20 @@ $(document).ready(function () {
         $tableBody.empty();
         if (optimizations.length === 0) {
             $tableBody.append('<tr><td colspan="4" class="text-center">No optimizations available</td></tr>');
-        }
+        } else {
+            optimizations.forEach(opt => {
+                $tableBody.append(`
+                    <tr draggable="true" data-name="${opt.optimize_method_name}">
+                        <td>${opt.original_model_name}</td>
+                        <td>${opt.optimize_method_name}</td>
+                        <td>${opt.misc || ''}</td>
+                        <td>
+                            <button class="btn btn-sm btn-warning" onclick="editOptimization('${opt.optimize_method_name}')">Edit</button>
+                            <button class="btn btn-sm btn-danger" onclick="deleteOptimization('${opt.optimize_method_name}')">Delete</button>
+                        </td>
+                    </tr>
+                `);
+            });
     // Function to Load Template Options
     async function loadTemplateOptions() {
         console.log('Loading template options...');
