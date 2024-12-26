@@ -217,6 +217,9 @@ $(document).ready(function () {
                     </tr>
                 `);
             });
+            initOptimizationDragAndDrop(); // Enable drag-and-drop after rendering
+    }
+}
     // Function to Load Template Options
     async function loadTemplateOptions() {
         console.log('Loading template options...');
