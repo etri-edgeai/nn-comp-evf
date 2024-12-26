@@ -31,7 +31,6 @@ def get_templates():
 @optimizations.route('/reorder', methods=['POST'])
 @session_required
 def reorder_optimizations():
-    """Reorder optimizations in project.json."""
     try:
         data = request.json
         project_name = data.get('project_name')
@@ -40,31 +39,21 @@ def reorder_optimizations():
         if not all([project_name, new_order]):
             raise ValueError("Missing required parameters")
 
-        project_json_path = os.path.join(
-            './workspace', session["user"], project_name, 'project.json'
-        )
+        project_json_path = f'./workspace/{session["user"]}/{project_name}/project.json'
 
-        if not os.path.exists(project_json_path):
-            raise FileNotFoundError("Project configuration not found")
-
-        # Read current project data
         with open(project_json_path, 'r') as f:
             project_data = json.load(f)
 
-        # Create a map of optimization names to their data
-        optimization_map = {opt['optimize_method_name']: opt for opt in project_data.get('optimizations', [])}
+        optimization_map = {opt['optimize_method_name']: opt for opt in project_data['optimizations']}
+        project_data['optimizations'] = [optimization_map[name] for name in new_order]
 
-        # Reorder optimizations according to new order
-        project_data['optimizations'] = [optimization_map[name] for name in new_order if name in optimization_map]
-
-        # Save updated project.json
         with open(project_json_path, 'w') as f:
             json.dump(project_data, f, indent=4)
 
-        return jsonify({"message": "Optimizations reordered successfully", "error": None})
+        return jsonify({"message": "Order updated successfully."})
     except Exception as e:
-        print(f"Error in reorder_optimizations: {e}")
         return jsonify({"error": str(e)})
+
 
 
 
