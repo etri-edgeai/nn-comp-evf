@@ -127,56 +127,48 @@ $(document).ready(function () {
     function initOptimizationDragAndDrop() {
         const rows = document.querySelectorAll('#id_table_body_optimizations tr');
         let draggedRow = null;
-
+    
         rows.forEach(row => {
-            row.addEventListener('dragstart', function (e) {
+            row.addEventListener('dragstart', function () {
                 draggedRow = this;
                 this.style.opacity = '0.4';
-                e.dataTransfer.effectAllowed = 'move';
             });
-
+    
             row.addEventListener('dragend', function () {
                 this.style.opacity = '1';
                 rows.forEach(row => row.classList.remove('drag-over'));
             });
-
+    
             row.addEventListener('dragover', function (e) {
                 e.preventDefault();
-                e.dataTransfer.dropEffect = 'move';
             });
-
+    
             row.addEventListener('dragenter', function () {
                 this.classList.add('drag-over');
             });
-            
+    
             row.addEventListener('dragleave', function () {
                 this.classList.remove('drag-over');
             });
-
+    
             row.addEventListener('drop', function (e) {
                 e.preventDefault();
                 if (this === draggedRow) return;
-
-                const allRows = [...rows];
-                const draggedIndex = allRows.indexOf(draggedRow);
-                const droppedIndex = allRows.indexOf(this);
-
-                if (draggedIndex < droppedIndex) {
-                    this.parentNode.insertBefore(draggedRow, this.nextSibling);
-                } else {
-                    this.parentNode.insertBefore(draggedRow, this);
-                }
-
+    
+                this.parentNode.insertBefore(draggedRow, this.nextSibling);
                 saveOptimizationOrder();
             });
         });
     }
+    
+    
 
     async function saveOptimizationOrder() {
         const newOrder = [];
         document.querySelectorAll('#id_table_body_optimizations tr').forEach(row => {
             newOrder.push(row.dataset.name); // Use the unique optimization name as an identifier
         });
+    
         try {
             const response = await fetch('/optimizations/reorder', {
                 method: 'POST',
@@ -188,25 +180,36 @@ $(document).ready(function () {
             });
     
             const data = await response.json();
-            if (data.error) {
-                toastr.error(data.error, "Error");
-            } else {
+            if (!data.error) {
                 toastr.success(data.message, "Success");
+            } else {
+                toastr.error(data.error, "Error");
             }
         } catch (error) {
             console.error('Failed to save new order:', error);
             toastr.error('Failed to save the new order', "Error");
         }
     }
+    
     function updateOptimizationTable(optimizations) {
         const $tableBody = $('#id_table_body_optimizations');
         $tableBody.empty();
+    
         if (optimizations.length === 0) {
-            $tableBody.append('<tr><td colspan="4" class="text-center">No optimizations available</td></tr>');
+            $tableBody.append('<tr><td colspan="5" class="text-center">No optimizations available</td></tr>');
         } else {
             optimizations.forEach(opt => {
                 $tableBody.append(`
                     <tr draggable="true" data-name="${opt.optimize_method_name}">
+                        <td class="drag-handle">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24"
+                                 stroke-width="2" stroke="currentColor" fill="none">
+                                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                <line x1="4" y1="6" x2="20" y2="6" />
+                                <line x1="4" y1="12" x2="20" y2="12" />
+                                <line x1="4" y1="18" x2="20" y2="18" />
+                            </svg>
+                        </td>
                         <td>${opt.original_model_name}</td>
                         <td>${opt.optimize_method_name}</td>
                         <td>${opt.misc || ''}</td>
@@ -217,9 +220,14 @@ $(document).ready(function () {
                     </tr>
                 `);
             });
-            initOptimizationDragAndDrop(); // Enable drag-and-drop after rendering
+    
+            // IMPORTANT: call drag-and-drop initializer after rendering:
+            initOptimizationDragAndDrop();
         }
     }
+    
+    
+    
     // Function to Load Template Options
     async function loadTemplateOptions() {
         console.log('Loading template options...');
@@ -305,32 +313,6 @@ $(document).ready(function () {
         } catch (error) {
             console.error("Load optimization list error:", error);
             toastr.error("Failed to load optimizations.", "error");
-        }
-    }
-
-    // Function to Update Optimization Table
-    function updateOptimizationTable(optimizations) {
-        console.log('Updating optimization table with:', optimizations);
-        const $tableBody = $('#id_table_body_optimizations');
-        $tableBody.empty();
-
-        if (optimizations.length === 0) {
-            $tableBody.append('<tr><td colspan="4" class="text-center">No optimizations available</td></tr>');
-        } else {
-            optimizations.forEach(opt => {
-                const $row = $(
-                    `<tr>
-                        <td>${opt.original_model_name}</td>
-                        <td>${opt.optimize_method_name}</td>
-                        <td>${opt.misc || ''}</td>
-                        <td>
-                            <button class="btn btn-sm btn-warning" onclick="editOptimization('${opt.optimize_method_name}')">Edit</button>
-                            <button class="btn btn-sm btn-danger" onclick="deleteOptimization('${opt.optimize_method_name}')">Delete</button>
-                        </td>
-                    </tr>`
-                );
-                $tableBody.append($row);
-            });
         }
     }
 
