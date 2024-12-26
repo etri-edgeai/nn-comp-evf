@@ -55,6 +55,10 @@ def reorder_optimizations():
         # Create a map of optimization names to their data
         optimization_map = {opt['optimize_method_name']: opt for opt in project_data.get('optimizations', [])}
 
+        # Reorder optimizations according to new order
+        project_data['optimizations'] = [optimization_map[name] for name in new_order if name in optimization_map]
+
+
 
 # Load specific template content
 @optimizations.route('/load_template', methods=['POST'])
