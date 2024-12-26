@@ -150,6 +150,9 @@ def save_edit():
         if not os.path.isfile(optimize_py_path):
             raise FileNotFoundError(f"optimize.py not found at {optimize_py_path}")
 
+        # Overwrite the file with the new code
+        with open(optimize_py_path, 'w', encoding='utf-8') as f:
+            f.write(edited_code)
 
 
 
