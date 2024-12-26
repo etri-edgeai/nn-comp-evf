@@ -32,6 +32,10 @@ def get_templates():
 @session_required
 def reorder_optimizations():
     """Reorder optimizations in project.json."""
+    try:
+        data = request.json
+        project_name = data.get('project_name')
+        new_order = data.get('order')
 
 
 # Load specific template content
