@@ -154,6 +154,9 @@ def save_edit():
         with open(optimize_py_path, 'w', encoding='utf-8') as f:
             f.write(edited_code)
 
+        # (Optionally, update meta.json if there's any change to original_model_name, etc.)
+        # For example, if you want to store a new "timestamp" or something, do it here.
+
 
 
 # Save a new optimization
