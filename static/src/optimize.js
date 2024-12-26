@@ -53,6 +53,14 @@ $(document).ready(function () {
                 $('#id_modal_edit_optimization').modal('hide');
                 loadOptimizationList(); // refresh the table
                 }
+            } catch (error) {
+                console.error("Error saving edited optimization:", error);
+                toastr.error("Failed to save optimization.", "Error");
+            }
+
+
+
+
     // When the modal is hidden, clear the editor and reset form fields
     $('#id_modal_create_optimization').on('hidden.bs.modal', function () {
         $('#id_original_model_name').empty();
