@@ -105,6 +105,8 @@ def get_optimization():
         meta_path = os.path.join(user_path, 'meta.json')
         if not os.path.exists(meta_path):
             raise FileNotFoundError(f"meta.json not found for optimization '{optimize_method_name}'")
+        with open(meta_path, 'r') as f:
+          meta_data = json.load(f)
 
 
 
