@@ -90,7 +90,12 @@ def get_optimization():
     ./workspace/<user>/<project_name>/optimizations/<optimize_method_name>
     and return the contents + metadata from meta.json.
     """
-
+    try:
+        data = request.json
+        project_name = data.get('project_name')
+        optimize_method_name = data.get('optimize_method_name')
+        if not (project_name and optimize_method_name):
+            raise ValueError("Missing required parameters")
 # Save a new optimization
 @optimizations.route('/save', methods=['POST'])
 @session_required
