@@ -47,11 +47,17 @@ def static_proxy(path):
     return app.send_static_file(path)  # send_static_file will guess the correct MIME type
 
 
-
 @app.route('/favicon.ico')
 def favicon():
-    return send_from_directory(os.path.join(app.root_path, 'static'),
-                               'favicon.ico', mimetype='image/vnd.microsoft.icon')
+    try:
+        return send_from_directory(
+            os.path.join(app.root_path, 'static', 'images'),
+            'favicon.ico',
+            mimetype='image/vnd.microsoft.icon'
+        )
+    except Exception as e:
+        app.logger.error(f"Error serving favicon: {str(e)}")
+        return '', 204  # Return no content instead of 500 error
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5001)
