@@ -50,7 +50,18 @@ class ThemeManager {
         });
     }
 
-
+    updateProjectSelector(theme) {
+        const projectSelect = document.getElementById('id_project');
+        if (projectSelect) {
+            if (theme === 'dark') {
+                projectSelect.style.backgroundColor = '#1a1f24';
+                projectSelect.style.color = '#ffffff';
+            } else {
+                projectSelect.style.backgroundColor = '';
+                projectSelect.style.color = '';
+            }
+        }
+    }
 
 
 
