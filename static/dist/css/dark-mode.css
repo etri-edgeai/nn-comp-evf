@@ -55,3 +55,39 @@
     --tblr-table-bg: #242a30;
     --tblr-table-border-color: #2c3338;
  }
+
+ /* Add to your dark-mode.css */
+.theme-dark .ace-editor {
+   background-color: #1a1f24;
+   color: #f1f5f9;
+}
+
+.theme-dark .table {
+   color: #f1f5f9;
+}
+
+.theme-dark .table td,
+.theme-dark .table th {
+   border-color: #2c3338;
+}
+
+.theme-dark .drag-handle {
+   color: #6c757d;
+}
+
+.theme-dark .drag-over {
+   background-color: #2c3338;
+}
+
+.theme-dark .ace_editor {
+   background-color: #1a1f24;
+}
+
+.theme-dark .ace_gutter {
+   background-color: #242a30;
+   color: #6c757d;
+}
+
+.theme-dark .ace_print-margin {
+   background-color: #2c3338;
+}
