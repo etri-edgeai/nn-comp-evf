@@ -27,8 +27,8 @@
                         </tbody>
                     </table>
                 </div>
-                <div id="logs_container" style="height: 500px; overflow-y: scroll; background-color: white; padding: 10px; border: 1px solid #ccc;">
-                    <div id="logs_content" style="font-family: 'Courier New', monospace; color: black;"></div>
+                <div id="logs_container"class="theme-dark" style="height: 500px; overflow-y: scroll; ; padding: 10px; border: 1px solid #ccc;">
+                    <div id="logs_content" style="font-family: 'Courier New', monospace; color: white;"></div>
                 </div>
                 
                 <style>
@@ -180,6 +180,28 @@
   
 
 <style>
+    .theme-dark #logs_container {
+    height: 500px;
+    overflow-y: scroll;
+    background-color: #1a1f24;
+    padding: 10px;
+    border: 1px solid #2c3338;
+    margin-top: 20px;
+    }
+
+    .theme-dark #logs_content {
+        color: #f1f5f9;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+    }
+
+    .theme-dark .log-line {
+        display: block;
+        white-space: pre;
+        line-height: 1.5;
+        min-height: 1.5em;
+    }
+
     .editor {
         width: 100%;
         /* Fixed height so it won't grow infinitely */
@@ -190,9 +212,26 @@
     .form-control-plaintext {
         font-weight: normal;
     }
+    #logs_container {
+    height: 500px;
+    overflow-y: scroll;
+    background-color: white;
+    padding: 10px;
+    border: 1px solid #ccc;
+    margin-top: 20px;
+    }
+
     #logs_content {
-        white-space: pre-wrap; /* Preserve whitespace and wrap lines */
-        word-wrap: break-word; /* Break long words to prevent overflow */
+        color: #ffffff;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+    }
+
+    .log-line {
+        display: block;
+        white-space: pre;
+        line-height: 1.5;
+        min-height: 1.5em;
     }
 </style>
 

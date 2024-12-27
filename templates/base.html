@@ -11,13 +11,19 @@
         <link href="/static/dist/css/tabler-vendors.min.css" rel="stylesheet" />
         <link href="/static/dist/css/dark-mode.css" rel="stylesheet" />
         <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" />
-        <link href="https://cdn.jsdelivr.net/npm/tabler-icons@1.39.1/iconfont/tabler-icons.min.css" rel="stylesheet">
+        <!-- <link href="https://cdn.jsdelivr.net/npm/tabler-icons@1.39.1/iconfont/tabler-icons.min.css" rel="stylesheet"> -->
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+
 
         <!-- Scripts -->
         <script src="/static/ace/src-min/ace.js" type="text/javascript"></script>
         <script src="/static/dist/js/tabler.min.js"></script>
         <script src="/static/js/jquery.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
+
+        <link rel="icon" type="image/x-icon" href="/static/images/favicon.ico">
+        <link rel="shortcut icon" type="image/x-icon" href="/static/images/favicon.ico">
 
         <!-- Page Initialization -->
         <script>
@@ -214,10 +220,6 @@
             </div>
         </div>
 
-        {% block scripts %}{% endblock %}
-        
-        <!-- Core Scripts -->
-        <script src="/static/src/base.js"></script>
         <script>
             // Prevent browser's default save behavior
             document.addEventListener('keydown', function(e) {
@@ -226,6 +228,33 @@
                     return false;
                 }
             }, {passive: false});
+        </script>
+        
+        <!-- Debug loading -->
+        <script>
+            console.log('Starting script load...');
+            window.addEventListener('error', function(e) {
+                console.error('Script error:', e.filename, e.message);
+            });
+        </script>
+        
+        <!-- Load base.js -->
+        <script src="/static/src/base.js" onerror="console.error('Failed to load base.js')" onload="console.log('base.js loaded')"></script>
+        
+        <!-- Initialize after load -->
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                console.log('DOM loaded, checking ProjectManager...');
+                try {
+                    if (window.ProjectManager) {
+                        console.log('ProjectManager found');
+                    } else {
+                        console.error('ProjectManager not found');
+                    }
+                } catch (e) {
+                    console.error('Error checking ProjectManager:', e);
+                }
+            });
         </script>
     </body>
 </html>
