@@ -5,3 +5,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const deployMethodSelect = document.getElementById('deploy-method');
     const deployButton = document.getElementById('deploy-button');
 
+    // Hide/Show deployment options
+    deployMethodSelect.addEventListener('change', () => {
+        document.querySelectorAll('.deployment-options').forEach(option => {
+            option.classList.add('d-none');
+        });
+        const selectedMethod = deployMethodSelect.value;
+        if (selectedMethod) {
+            document.getElementById(`${selectedMethod}-options`).classList.remove('d-none');
+        }
+    });
