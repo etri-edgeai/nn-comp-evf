@@ -1,51 +1,123 @@
 {% extends 'base.html' %}
 {% block content %}
 <div class="container-fluid py-4">
-
+  
+  <!-- Runs List -->
   <div class="card mb-3">
     <div class="card-header">
       <h3 class="card-title">Deploy - Runs List</h3>
     </div>
     <div class="card-body">
-      <div class="table-responsive">
-        <table class="table table-striped">
-          <thead>
-            <tr>
-              <th>Run Name</th>
-              <th>Created Date</th>
-              <th>Model</th>
-              <th>Dataset</th>
-              <th>Optimization</th>
-              <th>Status</th>
-              <th>GPU(s)</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody id="id_table_body_deploy_runs">
-            <!-- Runs will be loaded here by deploy.js -->
-          </tbody>
-        </table>
-      </div>
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>Run Name</th>
+            <th>Created Date</th>
+            <th>Model</th>
+            <th>Dataset</th>
+            <th>Optimization</th>
+            <th>Status</th>
+            <th>GPU(s)</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="id_table_body_deploy_runs">
+          <!-- Populated by deploy.js -->
+        </tbody>
+      </table>
     </div>
   </div>
 
-  
-  <!-- Directory Tree Section -->
-  <div class="card">
+  <!-- Directory Explorer -->
+  <div class="card mb-3">
     <div class="card-header">
       <h3 class="card-title">Directory Explorer</h3>
     </div>
     <div class="card-body">
-      <!-- A placeholder for the run name we are exploring -->
       <h5>Currently Exploring: <span id="id_explore_run_name"></span></h5>
-      
-      <!-- The container for our nested directory structure -->
-      <div id="id_directory_tree"></div>
+      <hr/>
+      <div id="id_directory_tree" style="max-height: 500px; overflow-y: auto;"></div>
     </div>
   </div>
-  
+
+  <!-- Deployment Options -->
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title">Deployment Methods</h3>
+    </div>
+    <div class="card-body">
+      <p>Selected File: <code id="id_selected_file">None</code></p>
+      <div class="btn-group">
+        <button type="button" class="btn btn-primary"
+                onclick="deploySelectedFile('download')">
+          Download
+        </button>
+        <button type="button" class="btn btn-info"
+                onclick="deploySelectedFile('scp')">
+          SCP / SFTP
+        </button>
+        <button type="button" class="btn btn-warning"
+                onclick="deploySelectedFile('ftp')">
+          FTP
+        </button>
+      </div>
+    </div>
+  </div>
+
 </div>
 
-<!-- Include deploy.js at the bottom -->
+<!-- Modal for SCP/FTP Credentials -->
+<div class="modal fade" id="id_modal_credentials" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <h5 class="modal-title">Enter Credentials - <span id="id_modal_method_label"></span></h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                aria-label="Close"></button>
+      </div>
+
+      <div class="modal-body">
+        <form id="id_form_credentials">
+
+          <div class="mb-3">
+            <label class="form-label">Host</label>
+            <input type="text" class="form-control" id="id_input_host" placeholder="example.com">
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Port</label>
+            <input type="number" class="form-control" id="id_input_port" value="22">
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Username</label>
+            <input type="text" class="form-control" id="id_input_username">
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Password</label>
+            <input type="password" class="form-control" id="id_input_password">
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Remote Path</label>
+            <input type="text" class="form-control" id="id_input_remote_path"
+                   placeholder="/tmp/deployed_model.pth">
+          </div>
+        </form>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-link" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary"
+                id="id_modal_credentials_ok">
+          Deploy
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script src="/static/src/deploy.js"></script>
 {% endblock %}
