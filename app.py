@@ -17,7 +17,7 @@ from runs import runs  # Import the new experiments blueprint
 from datasets import dataset
 from optimize import optimizations  # Correct the import to match the Blueprint name
 from monitor import monitor_bp
-
+from deploy import deploy_bp
 
 app = Flask(__name__, static_url_path='/static')
 app.register_blueprint(auth, url_prefix='/auth')
@@ -31,6 +31,7 @@ app.register_blueprint(runs, url_prefix='/runs')  # Register the experiments blu
 app.register_blueprint(monitor_bp, url_prefix='/monitor')
 app.register_blueprint(dashboard, url_prefix='/dashboard')
 
+app.register_blueprint(deploy_bp, url_prefix='/deploy')
 # app.register_blueprint(jobs, url_prefix='/jobs')
 
 app.secret_key = 'SECRET_KEY_!!!'
