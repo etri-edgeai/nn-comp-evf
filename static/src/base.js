@@ -98,8 +98,14 @@ class ToastManager {
         toastr.warning(message);
     }
 
-
-
+    info(message) {
+        toastr.info(message);
+    }
+}
+class NavigationManager {
+    constructor() {
+        this.highlightActiveNavItem();
+    }
 
 
 
