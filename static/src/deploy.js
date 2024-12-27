@@ -70,6 +70,15 @@ $(document).ready(function() {
         });
     }
 
+    // =================================================
+    // DIRECTORY TREE RENDERING
+    // =================================================
+    function renderDirectoryTree(treeData, $container) {
+        const $rootUl = $('<ul class="tree-root"></ul>');
+        const $rootLi = buildTreeItem(treeData);
+        $rootUl.append($rootLi);
+        $container.append($rootUl);
+    }
 
 
 
