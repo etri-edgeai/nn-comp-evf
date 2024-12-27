@@ -66,6 +66,36 @@ class ThemeManager {
     getCurrentTheme() {
         return localStorage.getItem('theme') || 'light';
     }
+}
+
+class ToastManager {
+    constructor() {
+        this.configure();
+    }
+
+    configure() {
+        toastr.options = {
+            closeButton: true,
+            progressBar: true,
+            positionClass: "toast-bottom-right",
+            showDuration: "300",
+            hideDuration: "100",
+            timeOut: "1000",
+            extendedTimeOut: "1000",
+            showMethod: "fadeIn",
+            hideMethod: "fadeOut"
+        };
+    }
+
+
+
+
+
+
+
+
+
+
 
 
 
