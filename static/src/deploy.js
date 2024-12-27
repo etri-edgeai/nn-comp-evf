@@ -33,3 +33,15 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error('Error loading runs:', error);
         }
     }
+    
+    // Fetch and display directory tree for a selected run
+    async function loadRunDetails(run) {
+        try {
+            const response = await fetch(`/deploy/run/${run.id}/directory`);
+            const tree = await response.json();
+            renderDirectoryTree(tree);
+            deploymentSection.classList.remove('d-none');
+        } catch (error) {
+            console.error('Error loading run details:', error);
+        }
+    }
