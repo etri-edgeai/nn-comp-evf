@@ -79,7 +79,46 @@ $(document).ready(function() {
         $rootUl.append($rootLi);
         $container.append($rootUl);
     }
+    
+    function buildTreeItem(node) {
+        const isDir = (node.type === 'directory');
+        const $label = $('<span>').text(node.name);
 
+        // If directory, add an arrow
+        if (isDir) $label.prepend('<i class="folder-toggle">▶ </i>');
+
+        const $li = $('<li>').append($label);
+
+        if (isDir && node.children && node.children.length > 0) {
+            const $ul = $('<ul style="display:none; margin-left:1em;"></ul>');
+            node.children.forEach(child => {
+                const $childLi = buildTreeItem(child);
+                $ul.append($childLi);
+            });
+            $li.append($ul);
+
+            // Toggle expand/collapse
+            $label.on('click', function(e) {
+                e.stopPropagation();
+                $ul.toggle();
+                const $icon = $(this).find('.folder-toggle');
+                if ($ul.is(':visible')) {
+                    $icon.text('▼ ');
+                } else {
+                    $icon.text('▶ ');
+                }
+            });
+        } else if (!isDir) {
+            // It's a file => set up selection
+            $label.on('click', function(e) {
+                e.stopPropagation();
+                selectedFilePath = node.path;
+                console.log("Selected file:", selectedFilePath);
+                $('#id_selected_file').text(selectedFilePath);
+            });
+        }
+        return $li;
+    }
 
 
 });
