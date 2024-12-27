@@ -15,3 +15,21 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById(`${selectedMethod}-options`).classList.remove('d-none');
         }
     });
+    
+    // Fetch and display runs
+    async function loadRuns() {
+        try {
+            const response = await fetch('/deploy/runs');
+            const runs = await response.json();
+            runsList.innerHTML = '';
+            runs.forEach(run => {
+                const listItem = document.createElement('li');
+                listItem.className = 'list-group-item';
+                listItem.textContent = run.name;
+                listItem.addEventListener('click', () => loadRunDetails(run));
+                runsList.appendChild(listItem);
+            });
+        } catch (error) {
+            console.error('Error loading runs:', error);
+        }
+    }
