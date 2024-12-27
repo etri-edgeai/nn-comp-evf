@@ -24,3 +24,25 @@ class ThemeManager {
         this.updateModals(theme);
         this.updateProjectSelector(theme);
     }
+
+    updateFormElements(theme) {
+        const isDark = theme === 'dark';
+        document.querySelectorAll('.form-control, .form-select').forEach(element => {
+            if (isDark) {
+                element.style.backgroundColor = '#1a1f24';
+                element.style.color = '#ffffff';
+                element.style.borderColor = '#2c3338';
+            } else {
+                element.style.backgroundColor = '';
+                element.style.color = '';
+                element.style.borderColor = '';
+            }
+        });
+    }
+
+
+
+
+
+
+
