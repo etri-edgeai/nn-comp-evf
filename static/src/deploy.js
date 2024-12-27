@@ -45,3 +45,21 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error('Error loading run details:', error);
         }
     }
+    
+    // Render directory tree
+    function renderDirectoryTree(tree, parent = directoryTree) {
+        parent.innerHTML = '';
+        Object.entries(tree).forEach(([key, value]) => {
+            const item = document.createElement('div');
+            item.textContent = key;
+            if (typeof value === 'object') {
+                const subtree = document.createElement('div');
+                subtree.style.paddingLeft = '20px';
+                renderDirectoryTree(value, subtree);
+                item.appendChild(subtree);
+            } else {
+                item.addEventListener('click', () => selectCheckpointFile(value));
+            }
+            parent.appendChild(item);
+        });
+    }
