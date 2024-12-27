@@ -129,7 +129,7 @@ class ProjectManager {
         
         this.initialize();
     }
-    initialize() {
+    async initialize() {
         if (this.createProjectBtn) {
             this.createProjectBtn.addEventListener('click', () => this.createProject());
         }
@@ -139,10 +139,33 @@ class ProjectManager {
         }
 
         if (this.projectSelect) {
+            // First try to get current project from server
+            await this.loadCurrentProject();
+            
             this.projectSelect.addEventListener('change', () => this.handleProjectChange());
-            this.loadProjects();
+            await this.loadProjects();
         }
     }
+
+    async loadCurrentProject() {
+        try {
+            const response = await fetch('/project/current_project', {
+                method: 'GET'
+            });
+            const data = await response.json();
+            
+            if (!data.err && data.res.project_name) {
+                // Store in localStorage as backup
+                localStorage.setItem('currentProject', data.res.project_name);
+            } else if (localStorage.getItem('currentProject')) {
+                // If server has no project but localStorage does, try to restore it
+                await this.handleProjectChange(localStorage.getItem('currentProject'));
+            }
+        } catch (error) {
+            console.error('Error loading current project:', error);
+        }
+    }
+
     async loadProjects() {
         try {
             const response = await fetch('/project/list', {
@@ -171,14 +194,10 @@ class ProjectManager {
                 });
             }
 
-            // Set current project if exists
-            const response2 = await fetch('/project/current_project', {
-                method: 'GET'
-            });
-            const currentData = await response2.json();
-            
-            if (!currentData.err && currentData.res.project_name) {
-                this.projectSelect.value = currentData.res.project_name;
+            // Set current project
+            const currentProject = localStorage.getItem('currentProject');
+            if (currentProject) {
+                this.projectSelect.value = currentProject;
             }
             
         } catch (error) {
@@ -186,6 +205,7 @@ class ProjectManager {
             console.error('Error loading projects:', error);
         }
     }
+
     async createProject() {
         const projectName = this.projectNameInput.value.trim();
         if (!projectName) {
