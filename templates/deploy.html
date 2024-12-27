@@ -1,89 +1,33 @@
 {% extends 'base.html' %}
 {% block content %}
-<div class="page-wrapper">
-    <div class="container-fluid py-4">
-        <div class="card">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h3 class="card-title">Deploy Checkpoint</h3>
-            </div>
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-md-3 bg-light sidebar">
-                        <h4 class="mt-3">Available Runs</h4>
-                        <ul id="runs-list" class="list-group">
-                            <!-- Dynamically populated list of runs -->
-                        </ul>
-                    </div>
-                    <div class="col-md-9">
-                        <h3 class="mt-3">Run Details</h3>
-                        <div id="run-directory" class="mt-3">
-                            <p>Select a run to view its checkpoint files.</p>
-                            <div id="directory-tree">
-                                <!-- Directory tree will be rendered here -->
-                            </div>
-                        </div>
-                        <div id="deployment-section" class="mt-4 d-none">
-                            <h4>Deployment Options</h4>
-                            <form id="deploy-form">
-                                <div class="mb-3">
-                                    <label for="deploy-method" class="form-label">Select Deployment Method</label>
-                                    <select class="form-select" id="deploy-method">
-                                        <option value="">Choose...</option>
-                                        <option value="ftp">FTP</option>
-                                        <option value="ssh">SSH</option>
-                                        <option value="download">Download</option>
-                                    </select>
-                                </div>
-                                <div id="ftp-options" class="deployment-options d-none">
-                                    <h5>FTP Configuration</h5>
-                                    <div class="mb-3">
-                                        <label for="ftp-server" class="form-label">Server Address</label>
-                                        <input type="text" class="form-control" id="ftp-server" placeholder="ftp.example.com">
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="ftp-username" class="form-label">Username</label>
-                                        <input type="text" class="form-control" id="ftp-username" placeholder="Username">
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="ftp-password" class="form-label">Password</label>
-                                        <input type="password" class="form-control" id="ftp-password" placeholder="Password">
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="ftp-path" class="form-label">Remote Path</label>
-                                        <input type="text" class="form-control" id="ftp-path" placeholder="/path/to/deploy">
-                                    </div>
-                                </div>
-                                <div id="ssh-options" class="deployment-options d-none">
-                                    <h5>SSH Configuration</h5>
-                                    <div class="mb-3">
-                                        <label for="ssh-host" class="form-label">Host</label>
-                                        <input type="text" class="form-control" id="ssh-host" placeholder="192.168.1.1">
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="ssh-username" class="form-label">Username</label>
-                                        <input type="text" class="form-control" id="ssh-username" placeholder="Username">
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="ssh-password" class="form-label">Password</label>
-                                        <input type="password" class="form-control" id="ssh-password" placeholder="Password">
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="ssh-path" class="form-label">Remote Path</label>
-                                        <input type="text" class="form-control" id="ssh-path" placeholder="/path/to/deploy">
-                                    </div>
-                                </div>
-                                <div id="download-options" class="deployment-options d-none">
-                                    <h5>Download Configuration</h5>
-                                    <p>Click "Deploy" to download the checkpoint file to your local machine.</p>
-                                </div>
-                                <button type="button" class="btn btn-primary" id="deploy-button">Deploy</button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+<div class="container-fluid py-4">
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title">Deploy - Runs List</h3>
     </div>
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th>Run Name</th>
+              <th>Created Date</th>
+              <th>Model</th>
+              <th>Dataset</th>
+              <th>Optimization</th>
+              <th>Status</th>
+              <th>GPU(s)</th>
+            </tr>
+          </thead>
+          <tbody id="id_table_body_deploy_runs">
+            <!-- Runs will be loaded here by deploy.js -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
 </div>
-<script src="/static/js/deploy.js"></script>
+
+<!-- Include deploy.js at the bottom -->
+<script src="/static/src/deploy.js"></script>
 {% endblock %}
