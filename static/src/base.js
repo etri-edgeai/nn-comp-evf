@@ -271,6 +271,8 @@ class ProjectManager {
     }
 }
 
+
+
 // Initialize everything when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
     window.themeManager = new ThemeManager();
