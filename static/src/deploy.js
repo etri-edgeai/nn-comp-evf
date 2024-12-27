@@ -210,4 +210,6 @@ $(document).ready(function() {
         }
     });
 
+    // INITIALIZE
+    loadRuns();
 });
