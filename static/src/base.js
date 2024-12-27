@@ -271,7 +271,13 @@ class ProjectManager {
     }
 }
 
-
+// Initialize everything when DOM is ready
+document.addEventListener('DOMContentLoaded', () => {
+    window.themeManager = new ThemeManager();
+    window.toastManager = new ToastManager();
+    window.navigationManager = new NavigationManager();
+    window.projectManager = new ProjectManager();
+});
 
 
 
