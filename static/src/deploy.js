@@ -1,135 +1,62 @@
-document.addEventListener('DOMContentLoaded', () => {
-    const runsList = document.getElementById('runs-list');
-    const directoryTree = document.getElementById('directory-tree');
-    const deploymentSection = document.getElementById('deployment-section');
-    const deployMethodSelect = document.getElementById('deploy-method');
-    const deployButton = document.getElementById('deploy-button');
+$(document).ready(function() {
+    loadRuns();
 
-    // Hide/Show deployment options
-    deployMethodSelect.addEventListener('change', () => {
-        document.querySelectorAll('.deployment-options').forEach(option => {
-            option.classList.add('d-none');
-        });
-        const selectedMethod = deployMethodSelect.value;
-        if (selectedMethod) {
-            document.getElementById(`${selectedMethod}-options`).classList.remove('d-none');
-        }
-    });
-    
-    // Fetch and display runs
     async function loadRuns() {
-        try {
-            const response = await fetch('/deploy/runs');
-            const runs = await response.json();
-            runsList.innerHTML = '';
-            runs.forEach(run => {
-                const listItem = document.createElement('li');
-                listItem.className = 'list-group-item';
-                listItem.textContent = run.name;
-                listItem.addEventListener('click', () => loadRunDetails(run));
-                runsList.appendChild(listItem);
-            });
-        } catch (error) {
-            console.error('Error loading runs:', error);
-        }
-    }
-    
-    // Fetch and display directory tree for a selected run
-    async function loadRunDetails(run) {
-        try {
-            const response = await fetch(`/deploy/run/${run.id}/directory`);
-            const tree = await response.json();
-            renderDirectoryTree(tree);
-            deploymentSection.classList.remove('d-none');
-        } catch (error) {
-            console.error('Error loading run details:', error);
-        }
-    }
-    
-    // Render directory tree
-    function renderDirectoryTree(tree, parent = directoryTree) {
-        parent.innerHTML = '';
-        Object.entries(tree).forEach(([key, value]) => {
-            const item = document.createElement('div');
-            item.textContent = key;
-            if (typeof value === 'object') {
-                const subtree = document.createElement('div');
-                subtree.style.paddingLeft = '20px';
-                renderDirectoryTree(value, subtree);
-                item.appendChild(subtree);
-            } else {
-                item.addEventListener('click', () => selectCheckpointFile(value));
-            }
-            parent.appendChild(item);
-        });
-    }
-    
-    // Handle checkpoint file selection
-    let selectedCheckpoint = null;
-    function selectCheckpointFile(filePath) {
-        selectedCheckpoint = filePath;
-        console.log('Selected checkpoint file:', filePath);
-    }
-    
-    // Handle deployment
-    deployButton.addEventListener('click', async () => {
-        if (!selectedCheckpoint) {
-            alert('Please select a checkpoint file first.');
+        console.log("Loading runs for deployment...");
+
+        // Retrieve project_name from sessionStorage or wherever you store it
+        const projectName = sessionStorage.getItem('project_name');
+        if (!projectName) {
+            console.warn("No project name found in sessionStorage.");
             return;
         }
-        const deployMethod = deployMethodSelect.value;
-        if (!deployMethod) {
-            alert('Please select a deployment method.');
-            return;
-        }
-        
-        let payload;
-        switch (deployMethod) {
-            case 'ftp':
-                payload = {
-                    method: 'ftp',
-                    file: selectedCheckpoint,
-                    server: document.getElementById('ftp-server').value,
-                    username: document.getElementById('ftp-username').value,
-                    password: document.getElementById('ftp-password').value,
-                    path: document.getElementById('ftp-path').value,
-                };
-                break;
-            case 'ssh':
-                payload = {
-                    method: 'ssh',
-                    file: selectedCheckpoint,
-                    host: document.getElementById('ssh-host').value,
-                    username: document.getElementById('ssh-username').value,
-                    password: document.getElementById('ssh-password').value,
-                    path: document.getElementById('ssh-path').value,
-                };
-                break;
-            case 'download':
-                payload = { method: 'download', file: selectedCheckpoint };
-                break;
-            default:
-                alert('Invalid deployment method.');
-                return;
-        }
+
+        const payload = { project_name: projectName };
+
         try {
-            const response = await fetch('/deploy', {
+            const response = await fetch('/runs/list', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload),
+                body: JSON.stringify(payload)
             });
-            const result = await response.json();
-            if (result.success) {
-                alert('Deployment successful!');
-            } else {
-                alert(`Deployment failed: ${result.error}`);
-            }
-        } catch (error) {
-            console.error('Deployment error:', error);
-            alert('An error occurred during deployment.');
-        }
-    });
+            const data = await response.json();
 
-    // Initial load
-    loadRuns();
+            if (data.error) {
+                console.error("Error fetching runs:", data.error);
+                toastr.error(data.error);
+                return;
+            }
+
+            updateRunsTable(data.runs);
+        } catch (err) {
+            console.error("Error fetching runs:", err);
+            toastr.error("Failed to load runs.");
+        }
+    }
+
+    function updateRunsTable(runs) {
+        const $tableBody = $('#id_table_body_deploy_runs');
+        $tableBody.empty();
+
+        if (!runs || runs.length === 0) {
+            $tableBody.append('<tr><td colspan="7" class="text-center">No runs available</td></tr>');
+            return;
+        }
+
+        runs.forEach(run => {
+            const gpuList = (run.gpu_ids || []).join(', ') || 'N/A';
+            const row = `
+                <tr>
+                    <td>${run.run_name}</td>
+                    <td>${run.created_date || 'N/A'}</td>
+                    <td>${run.model_name || 'N/A'}</td>
+                    <td>${run.dataset_name || 'N/A'}</td>
+                    <td>${run.optimization_name || 'N/A'}</td>
+                    <td>${run.status || 'Not Running'}</td>
+                    <td>${gpuList}</td>
+                </tr>
+            `;
+            $tableBody.append(row);
+        });
+    }
 });
