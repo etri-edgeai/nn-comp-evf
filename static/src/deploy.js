@@ -128,3 +128,8 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error('Deployment error:', error);
             alert('An error occurred during deployment.');
         }
+    });
+
+    // Initial load
+    loadRuns();
+});
