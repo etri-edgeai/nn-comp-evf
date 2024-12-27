@@ -9,13 +9,12 @@
         <!-- CSS -->
         <link href="/static/dist/css/tabler.min.css" rel="stylesheet" />
         <link href="/static/dist/css/tabler-vendors.min.css" rel="stylesheet" />
+        <link href="/static/dist/css/dark-mode.css" rel="stylesheet" />
         <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" />
         <link href="https://cdn.jsdelivr.net/npm/tabler-icons@1.39.1/iconfont/tabler-icons.min.css" rel="stylesheet">
-        <link href="https://cdn.jsdelivr.net/npm/@tabler/icons@1.39.1/iconfont/tabler-icons.min.css" rel="stylesheet">
+
+        <!-- Scripts -->
         <script src="/static/ace/src-min/ace.js" type="text/javascript"></script>
-
-
-        <!-- Core Scripts -->
         <script src="/static/dist/js/tabler.min.js"></script>
         <script src="/static/js/jquery.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
@@ -27,24 +26,13 @@
                     closeButton: true,
                     progressBar: true,
                     positionClass: "toast-bottom-right",
-                    "showDuration": "300",        // 100ms
-                    "hideDuration": "100",        // 100ms
-
+                    showDuration: "300",
+                    hideDuration: "100",
                     timeOut: "1000",
                     extendedTimeOut: "1000",
                     showMethod: "fadeIn",
                     hideMethod: "fadeOut"
                 };
-
-                // Highlight active menu item based on URL
-                const currentPath = window.location.pathname;
-                $(".navbar-nav .nav-link").each(function () {
-                    if (this.href.includes(currentPath)) {
-                        $(this).addClass("active");
-                    } else {
-                        $(this).removeClass("active");
-                    }
-                });
             });
         </script>
     </head>
@@ -64,7 +52,7 @@
                     </h1>
 
                     <div class="collapse navbar-collapse" id="sidebar-menu">
-                        <!-- Replace the existing project selection section with this: -->
+                        <!-- Project Selection -->
                         <div class="px-3 my-3">
                             <div class="d-flex justify-content-between align-items-center mb-2">
                                 <div class="d-flex align-items-center">
@@ -95,11 +83,12 @@
                                     </button>
                                 </div>
                             </div>
-                            <select id="id_project" class="form-select text-dark" aria-label="Select Project" style="color: #000000; background-color: #ffffff;">
+                            <select id="id_project" class="form-select" aria-label="Select Project">
                                 <option value="">Select Project</option>
                             </select>
                         </div>
 
+                        <!-- Navigation Menu -->
                         <ul class="navbar-nav pt-lg-3">
                             <li class="nav-item">
                                 <a class="nav-link" href="/dashboard">
@@ -145,6 +134,7 @@
                             </li>
                         </ul>
 
+                        <!-- User Menu -->
                         <div class="mt-auto">
                             <div class="nav-item dropdown">
                                 <a href="#" class="nav-link" data-bs-toggle="dropdown">
@@ -158,6 +148,13 @@
                                     </a>
                                 </div>
                             </div>
+                        </div>
+
+                        <!-- Dark Mode Toggle -->
+                        <div class="d-flex justify-content-center my-3">
+                            <button class="btn btn-sm btn-outline-light" id="dark-mode-toggle" type="button">
+                                Dark Mode
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -218,15 +215,17 @@
         </div>
 
         {% block scripts %}{% endblock %}
-        <!-- Add this right before </body> -->
-    <script src="/static/src/base.js"></script>
-    <script>
-        document.addEventListener('keydown', function(e) {
-            if ((e.key === 's' || e.key === 'S') && (navigator.platform.match("Mac") ? e.metaKey : e.ctrlKey)) {
-                e.preventDefault();
-                return false;
-            }
-        }, {passive: false});
-    </script>
+        
+        <!-- Core Scripts -->
+        <script src="/static/src/base.js"></script>
+        <script>
+            // Prevent browser's default save behavior
+            document.addEventListener('keydown', function(e) {
+                if ((e.key === 's' || e.key === 'S') && (navigator.platform.match("Mac") ? e.metaKey : e.ctrlKey)) {
+                    e.preventDefault();
+                    return false;
+                }
+            }, {passive: false});
+        </script>
     </body>
 </html>
