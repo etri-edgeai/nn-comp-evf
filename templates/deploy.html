@@ -1,7 +1,8 @@
 {% extends 'base.html' %}
 {% block content %}
 <div class="container-fluid py-4">
-  <div class="card">
+
+  <div class="card mb-3">
     <div class="card-header">
       <h3 class="card-title">Deploy - Runs List</h3>
     </div>
@@ -17,6 +18,7 @@
               <th>Optimization</th>
               <th>Status</th>
               <th>GPU(s)</th>
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody id="id_table_body_deploy_runs">
@@ -26,6 +28,21 @@
       </div>
     </div>
   </div>
+
+  <!-- Directory Tree Section -->
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title">Directory Explorer</h3>
+    </div>
+    <div class="card-body">
+      <!-- A placeholder for the run name we are exploring -->
+      <h5>Currently Exploring: <span id="id_explore_run_name"></span></h5>
+      
+      <!-- The container for our nested directory structure -->
+      <div id="id_directory_tree"></div>
+    </div>
+  </div>
+  
 </div>
 
 <!-- Include deploy.js at the bottom -->
