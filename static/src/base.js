@@ -280,6 +280,8 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 
+// Make theme manager available globally
+window.getCurrentTheme = () => window.themeManager.getCurrentTheme();
 
 
 
