@@ -79,7 +79,7 @@ $(document).ready(function() {
         $rootUl.append($rootLi);
         $container.append($rootUl);
     }
-    
+
     function buildTreeItem(node) {
         const isDir = (node.type === 'directory');
         const $label = $('<span>').text(node.name);
@@ -120,5 +120,41 @@ $(document).ready(function() {
         return $li;
     }
 
+    // =================================================
+    // DEPLOY: DOWNLOAD / SCP / FTP
+    // =================================================
+    window.deploySelectedFile = function(method) {
+        if (!selectedFilePath) {
+            toastr.warning("No file selected. Please click on a file in the tree.");
+            return;
+        }
+        if (method === 'download') {
+            // Just do GET => triggers direct file download
+            const url = `/deploy/transfer?method=download&file=${encodeURIComponent(selectedFilePath)}`;
+            window.location.href = url;  // cause download
+        } else if (method === 'scp' || method === 'ftp') {
+            // Open the credentials modal
+            chosenDeployMethod = method;
+            $('#id_modal_method_label').text(method.toUpperCase()); // e.g. "SCP" or "FTP"
+
+            // Reset form fields to defaults
+            if (method === 'scp') {
+                $('#id_input_port').val('22');
+            } else {
+                $('#id_input_port').val('21');
+            }
+            $('#id_input_host').val('');
+            $('#id_input_username').val('');
+            $('#id_input_password').val('');
+            $('#id_input_remote_path').val(method === 'scp'
+                ? '/tmp/deployed_model.pth'
+                : 'model.pth'
+            );
+
+            const modalEl = document.getElementById('id_modal_credentials');
+            const modal = new bootstrap.Modal(modalEl);
+            modal.show();
+        }
+    };
 
 });
