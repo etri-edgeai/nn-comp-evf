@@ -95,3 +95,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     path: document.getElementById('ftp-path').value,
                 };
                 break;
+            case 'ssh':
+                payload = {
+                    method: 'ssh',
+                    file: selectedCheckpoint,
+                    host: document.getElementById('ssh-host').value,
+                    username: document.getElementById('ssh-username').value,
+                    password: document.getElementById('ssh-password').value,
+                    path: document.getElementById('ssh-path').value,
+                };
+                break;
