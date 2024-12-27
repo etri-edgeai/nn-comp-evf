@@ -247,7 +247,29 @@ class ProjectManager {
             console.error('Error:', error);
         }
     }
+    async handleProjectChange() {
+        const selectedProject = this.projectSelect.value;
+        if (!selectedProject) return;
 
+        try {
+            const response = await fetch('/project/current_project', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ project: selectedProject })
+            });
+
+            const data = await response.json();
+            if (data.err) {
+                this.toastManager.error(data.err);
+            }
+        } catch (error) {
+            this.toastManager.error('Error setting current project');
+            console.error('Error:', error);
+        }
+    }
+}
 
 
 
