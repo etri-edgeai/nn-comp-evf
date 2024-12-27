@@ -105,3 +105,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     path: document.getElementById('ssh-path').value,
                 };
                 break;
+            case 'download':
+                    payload = { method: 'download', file: selectedCheckpoint };
+                    break;
+            default:
+                alert('Invalid deployment method.');
+                return;
+        }
