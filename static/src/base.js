@@ -119,4 +119,13 @@ class NavigationManager {
     }
 }
 
-
+class ProjectManager {
+    constructor() {
+        this.projectSelect = document.getElementById('id_project');
+        this.createProjectBtn = document.getElementById('id_create_project_ok');
+        this.deleteProjectBtn = document.getElementById('id_delete_project_ok');
+        this.projectNameInput = document.getElementById('id_project_name');
+        this.toastManager = new ToastManager();
+        
+        this.initialize();
+    }
