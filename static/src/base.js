@@ -39,7 +39,16 @@ class ThemeManager {
             }
         });
     }
-
+    updateModals(theme) {
+        const isDark = theme === 'dark';
+        document.querySelectorAll('.modal-content').forEach(modal => {
+            if (isDark) {
+                modal.classList.add('bg-dark', 'text-white');
+            } else {
+                modal.classList.remove('bg-dark', 'text-white');
+            }
+        });
+    }
 
 
 
