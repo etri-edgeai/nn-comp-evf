@@ -94,7 +94,9 @@ class ToastManager {
         toastr.error(message);
     }
 
-
+    warning(message) {
+        toastr.warning(message);
+    }
 
 
 
