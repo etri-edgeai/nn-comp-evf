@@ -1,0 +1,57 @@
+/* Create a new file: static/dist/css/dark-mode.css */
+
+.theme-dark {
+    --tblr-bg-surface: #1a1f24;
+    --tblr-body-bg: #1a1f24;
+    --tblr-body-color: #f1f5f9;
+    --tblr-card-bg: #242a30;
+    --tblr-border-color: #2c3338;
+    --tblr-input-bg: #242a30;
+    --tblr-input-color: #f1f5f9;
+    --tblr-input-border-color: #2c3338;
+ }
+ 
+ .theme-dark .navbar {
+    background: #242a30;
+ }
+ 
+ .theme-dark .modal-content {
+    background-color: #242a30;
+    border-color: #2c3338;
+    color: #f1f5f9;
+ }
+ 
+ .theme-dark .form-control,
+ .theme-dark .form-select {
+    background-color: #1a1f24;
+    border-color: #2c3338;
+    color: #f1f5f9;
+ }
+ 
+ .theme-dark .dropdown-menu {
+    background-color: #242a30;
+    border-color: #2c3338;
+ }
+ 
+ .theme-dark .dropdown-item {
+    color: #f1f5f9;
+ }
+ 
+ .theme-dark .dropdown-item:hover {
+    background-color: #1a1f24;
+ }
+ 
+ .theme-dark .btn-close {
+    filter: invert(1) grayscale(100%) brightness(200%);
+ }
+ 
+ .theme-dark .card {
+    background-color: #242a30;
+    border-color: #2c3338;
+ }
+ 
+ .theme-dark .table {
+    --tblr-table-color: #f1f5f9;
+    --tblr-table-bg: #242a30;
+    --tblr-table-border-color: #2c3338;
+ }
