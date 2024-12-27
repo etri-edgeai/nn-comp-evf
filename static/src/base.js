@@ -90,8 +90,9 @@ class ToastManager {
         toastr.success(message);
     }
 
-
-
+    error(message) {
+        toastr.error(message);
+    }
 
 
 
