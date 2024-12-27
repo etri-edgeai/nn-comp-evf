@@ -112,3 +112,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 alert('Invalid deployment method.');
                 return;
         }
+        try {
+            const response = await fetch('/deploy', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload),
+            });
+            const result = await response.json();
+            if (result.success) {
+                alert('Deployment successful!');
+            } else {
+                alert(`Deployment failed: ${result.error}`);
+            }
+        } catch (error) {
+            console.error('Deployment error:', error);
+            alert('An error occurred during deployment.');
+        }
