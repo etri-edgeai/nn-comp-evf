@@ -157,4 +157,57 @@ $(document).ready(function() {
         }
     };
 
+    // On "Deploy" in the credentials modal
+    $('#id_modal_credentials_ok').click(async function() {
+        // gather fields
+        const method = chosenDeployMethod; // 'scp' or 'ftp'
+        const host        = $('#id_input_host').val().trim();
+        const port        = parseInt($('#id_input_port').val().trim(), 10);
+        const username    = $('#id_input_username').val().trim();
+        const password    = $('#id_input_password').val();   // password can have spaces
+        const remote_path = $('#id_input_remote_path').val().trim();
+
+        // simple validation
+        if (!host || !port || !username) {
+            toastr.error("Please fill Host, Port, and Username fields.");
+            return;
+        }
+        // hide modal
+        const modalEl = document.getElementById('id_modal_credentials');
+        const modal = bootstrap.Modal.getInstance(modalEl);
+        modal.hide();
+
+        try {
+            // POST to /deploy/transfer with JSON body
+            const payload = {
+                method: method,
+                file: selectedFilePath,
+                host: host,
+                port: port,
+                username: username,
+                password: password,
+                remote_path: remote_path
+            };
+            const resp = await fetch('/deploy/transfer', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            if (!resp.ok) {
+                const errorTxt = await resp.text();
+                toastr.error(`Deployment failed. Server responded: ${errorTxt}`);
+                return;
+            }
+            const data = await resp.json();
+            if (data.error) {
+                toastr.error(data.error);
+            } else {
+                toastr.success(data.message || "Deployment successful!");
+            }
+        } catch (err) {
+            console.error("Error deploying file:", err);
+            toastr.error("Error deploying file.");
+        }
+    });
+
 });
