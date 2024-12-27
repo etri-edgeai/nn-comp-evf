@@ -186,7 +186,37 @@ class ProjectManager {
             console.error('Error loading projects:', error);
         }
     }
+    async createProject() {
+        const projectName = this.projectNameInput.value.trim();
+        if (!projectName) {
+            this.toastManager.warning('Please enter a project name');
+            return;
+        }
 
+        try {
+            const response = await fetch('/project/create', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ project_name: projectName })
+            });
+
+            const data = await response.json();
+
+            if (data.err) {
+                this.toastManager.error(data.err);
+            } else {
+                this.toastManager.success('Project created successfully');
+                this.loadProjects();
+                $('#id_modal_create_project').modal('hide');
+                this.projectNameInput.value = '';
+            }
+        } catch (error) {
+            this.toastManager.error('Error creating project');
+            console.error('Error:', error);
+        }
+    }
 
 
 
