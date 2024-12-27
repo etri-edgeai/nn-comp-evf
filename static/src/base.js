@@ -217,7 +217,36 @@ class ProjectManager {
             console.error('Error:', error);
         }
     }
+    async deleteProject() {
+        const projectName = this.projectSelect.value;
+        if (!projectName) {
+            this.toastManager.warning('Please select a project to delete');
+            return;
+        }
 
+        try {
+            const response = await fetch('/project/delete', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ project_name: projectName })
+            });
+
+            const data = await response.json();
+
+            if (data.err) {
+                this.toastManager.error(data.err);
+            } else {
+                this.toastManager.success('Project deleted successfully');
+                this.loadProjects();
+                $('#id_modal_delete_project').modal('hide');
+            }
+        } catch (error) {
+            this.toastManager.error('Error deleting project');
+            console.error('Error:', error);
+        }
+    }
 
 
 
