@@ -141,3 +141,45 @@ def scp_file(payload):
         transport.close()
 
     return jsonify({"message": f"SCP to {host}:{remote_path} succeeded."})
+def ftp_file(payload):
+    """
+    Uses Python's ftplib to upload a file. Expects:
+    {
+      "file": "/local/path",
+      "host": "...",
+      "port": 21,
+      "username": "...",
+      "password": "...",
+      "remote_path": "filename or subdir/filename"
+    }
+    """
+    file_path   = payload["file"]
+    host        = payload.get("host", "localhost")
+    port        = int(payload.get("port", 21))
+    username    = payload.get("username", "")
+    password    = payload.get("password", "")
+    remote_path = payload.get("remote_path", None)  # e.g. "some_subdir/model.pth"
+
+    # We'll parse out subdir if present
+    # e.g. remote_path="some_subdir/model.pth"
+    # Then subdir="some_subdir", filename="model.pth"
+    # For simplicity, if there's a slash, we try to cd into that subdir
+    ftp_filename = os.path.basename(remote_path) if remote_path else os.path.basename(file_path)
+    ftp_subdir = os.path.dirname(remote_path) if remote_path else ""
+
+    with FTP() as ftp:
+        ftp.connect(host=host, port=port, timeout=30)
+        ftp.login(user=username, passwd=password)
+        if ftp_subdir:
+            try:
+                ftp.cwd(ftp_subdir)
+            except:
+                # create directory if needed (optional)
+                ftp.mkd(ftp_subdir)
+                ftp.cwd(ftp_subdir)
+
+        with open(file_path, 'rb') as f:
+            ftp.storbinary(f"STOR {ftp_filename}", f)
+
+    return jsonify({"message": f"FTP to {host}:{remote_path or ftp_filename} succeeded."})
+
