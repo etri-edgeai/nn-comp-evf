@@ -107,6 +107,16 @@ class NavigationManager {
         this.highlightActiveNavItem();
     }
 
-
+    highlightActiveNavItem() {
+        const currentPath = window.location.pathname;
+        document.querySelectorAll(".navbar-nav .nav-link").forEach(link => {
+            if (link.href.includes(currentPath)) {
+                link.classList.add("active");
+            } else {
+                link.classList.remove("active");
+            }
+        });
+    }
+}
 
 
