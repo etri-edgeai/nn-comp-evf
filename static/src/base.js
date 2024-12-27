@@ -63,6 +63,9 @@ class ThemeManager {
         }
     }
 
+    getCurrentTheme() {
+        return localStorage.getItem('theme') || 'light';
+    }
 
 
 
