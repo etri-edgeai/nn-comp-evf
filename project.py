@@ -212,3 +212,4 @@ def delete_project():
         msg['err'] = f"Error deleting project: {str(e)}"
 
     return jsonify(msg)
+
