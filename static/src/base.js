@@ -155,11 +155,14 @@ class ProjectManager {
             const data = await response.json();
             
             if (!data.err && data.res.project_name) {
-                // Store in localStorage as backup
+                // Store in both storages
                 localStorage.setItem('currentProject', data.res.project_name);
+                sessionStorage.setItem('project_name', data.res.project_name);
             } else if (localStorage.getItem('currentProject')) {
                 // If server has no project but localStorage does, try to restore it
-                await this.handleProjectChange(localStorage.getItem('currentProject'));
+                const savedProject = localStorage.getItem('currentProject');
+                await this.handleProjectChange(savedProject);
+                sessionStorage.setItem('project_name', savedProject);
             }
         } catch (error) {
             console.error('Error loading current project:', error);
@@ -283,6 +286,13 @@ class ProjectManager {
             const data = await response.json();
             if (data.err) {
                 this.toastManager.error(data.err);
+                localStorage.removeItem('currentProject');
+                sessionStorage.removeItem('project_name');
+            } else {
+                localStorage.setItem('currentProject', selectedProject);
+                sessionStorage.setItem('project_name', selectedProject);
+                // Force reload to refresh all components
+                window.location.reload();
             }
         } catch (error) {
             this.toastManager.error('Error setting current project');
@@ -290,8 +300,6 @@ class ProjectManager {
         }
     }
 }
-
-
 
 // Initialize everything when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {

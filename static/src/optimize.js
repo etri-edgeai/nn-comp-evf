@@ -1,13 +1,31 @@
 $(document).ready(function () {
+
+
+    function updateEditorTheme(isDark) {
+        const theme = isDark ? "ace/theme/dracula" : "ace/theme/chrome";
+        if (window.editorOptimizePy) {
+            window.editorOptimizePy.setTheme(theme);
+        }
+        if (editorOptimizePyEdit) {
+            editorOptimizePyEdit.setTheme(theme);
+        }
+    }
+
+    // Listen for theme changes
+    window.addEventListener('themeChanged', (e) => {
+        updateEditorTheme(e.detail.theme === 'dark');
+    });
+
     // Initialize Ace Editor when the modal is shown
     $('#id_modal_create_optimization').on('shown.bs.modal', function () {
         if (!window.editorOptimizePy) {
             window.editorOptimizePy = ace.edit("editor_optimize_py");
-            editorOptimizePy.setTheme("ace/theme/monokai");
+            editorOptimizePy.setTheme(window.getCurrentTheme() === 'dark' ? "ace/theme/dracula" : "ace/theme/chrome");
             editorOptimizePy.session.setMode("ace/mode/python");
             editorOptimizePy.setOptions({
                 maxLines: Infinity,
-                minLines: 30
+                minLines: 30,
+                fontSize: "14px"
             });
         }
 
@@ -22,14 +40,15 @@ $(document).ready(function () {
     $('#id_modal_edit_optimization').on('shown.bs.modal', function () {
         if (!editorOptimizePyEdit) {
             editorOptimizePyEdit = ace.edit("editor_optimize_py_edit");
-            editorOptimizePyEdit.setTheme("ace/theme/monokai");
+            editorOptimizePyEdit.setTheme(window.getCurrentTheme() === 'dark' ? "ace/theme/dracula" : "ace/theme/chrome");
             editorOptimizePyEdit.session.setMode("ace/mode/python");
             editorOptimizePyEdit.setOptions({
                 maxLines: Infinity,
-                minLines: 30
+                minLines: 30,
+                fontSize: "14px"
             });
         }
-    })
+    });
 
 
     $('#id_modal_edit_optimization').on('hidden.bs.modal', function () {
@@ -255,9 +274,10 @@ $(document).ready(function () {
         if (optimizations.length === 0) {
             $tableBody.append('<tr><td colspan="5" class="text-center">No optimizations available</td></tr>');
         } else {
+            const isDark = window.getCurrentTheme() === 'dark';
             optimizations.forEach(opt => {
                 $tableBody.append(`
-                    <tr draggable="true" data-name="${opt.optimize_method_name}">
+                    <tr draggable="true" data-name="${opt.optimize_method_name}" class="${isDark ? 'text-light' : ''}">
                         <td class="drag-handle">
                             <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24"
                                  stroke-width="2" stroke="currentColor" fill="none">
@@ -278,7 +298,6 @@ $(document).ready(function () {
                 `);
             });
     
-            // IMPORTANT: call drag-and-drop initializer after rendering:
             initOptimizationDragAndDrop();
         }
     }
@@ -438,6 +457,17 @@ $(document).ready(function () {
             toastr.error("Failed to delete optimization.", "error");
         }
     };
+
+    const style = document.createElement('style');
+    style.textContent = `
+        .theme-dark .drag-over {
+            background-color: #2c3338 !important;
+        }
+        .theme-dark .table td {
+            border-color: #2c3338;
+        }
+    `;
+    document.head.appendChild(style);
 
     // Initial Load of Optimization List
     loadOptimizationList();
