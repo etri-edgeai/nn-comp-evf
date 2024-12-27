@@ -86,7 +86,9 @@ class ToastManager {
             hideMethod: "fadeOut"
         };
     }
-
+    success(message) {
+        toastr.success(message);
+    }
 
 
 
