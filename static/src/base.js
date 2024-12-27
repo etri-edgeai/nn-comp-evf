@@ -16,3 +16,11 @@ class ThemeManager {
             localStorage.setItem('theme', newTheme);
         });
     }
+    applyTheme(theme) {
+        const isDark = theme === 'dark';
+        document.body.classList.toggle('theme-dark', isDark);
+        this.toggleButton.textContent = isDark ? 'Light Mode' : 'Dark Mode';
+        this.updateFormElements(theme);
+        this.updateModals(theme);
+        this.updateProjectSelector(theme);
+    }
