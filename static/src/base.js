@@ -129,3 +129,72 @@ class ProjectManager {
         
         this.initialize();
     }
+    initialize() {
+        if (this.createProjectBtn) {
+            this.createProjectBtn.addEventListener('click', () => this.createProject());
+        }
+        
+        if (this.deleteProjectBtn) {
+            this.deleteProjectBtn.addEventListener('click', () => this.deleteProject());
+        }
+
+        if (this.projectSelect) {
+            this.projectSelect.addEventListener('change', () => this.handleProjectChange());
+            this.loadProjects();
+        }
+    }
+    async loadProjects() {
+        try {
+            const response = await fetch('/project/list', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+            const data = await response.json();
+
+            if (data.err) {
+                this.toastManager.error(data.err);
+                return;
+            }
+
+            // Clear existing options except the first one
+            while (this.projectSelect.options.length > 1) {
+                this.projectSelect.remove(1);
+            }
+
+            // Add projects to select
+            if (data.res && data.res.projects) {
+                data.res.projects.forEach(projectName => {
+                    const option = new Option(projectName, projectName);
+                    this.projectSelect.add(option);
+                });
+            }
+
+            // Set current project if exists
+            const response2 = await fetch('/project/current_project', {
+                method: 'GET'
+            });
+            const currentData = await response2.json();
+            
+            if (!currentData.err && currentData.res.project_name) {
+                this.projectSelect.value = currentData.res.project_name;
+            }
+            
+        } catch (error) {
+            this.toastManager.error('Failed to load projects');
+            console.error('Error loading projects:', error);
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
