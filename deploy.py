@@ -113,3 +113,31 @@ def deploy_transfer():
             return ftp_file(data)
         else:
             return jsonify({"error": f"Unsupported method: {method}"}), 400
+def scp_file(payload):
+    """
+    Uses paramiko to SFTP upload a file. Expects:
+    {
+      "file": "/local/path",
+      "host": "...",
+      "port": 22,
+      "username": "...",
+      "password": "...",
+      "remote_path": "/destination/path/filename"
+    }
+    """
+    file_path   = payload["file"]
+    host        = payload.get("host", "localhost")
+    port        = int(payload.get("port", 22))
+    username    = payload.get("username", "")
+    password    = payload.get("password", "")
+    remote_path = payload.get("remote_path", "/tmp/deployed_model.pth")
+
+    transport = paramiko.Transport((host, port))
+    try:
+        transport.connect(username=username, password=password)
+        sftp = paramiko.SFTPClient.from_transport(transport)
+        sftp.put(file_path, remote_path)
+    finally:
+        transport.close()
+
+    return jsonify({"message": f"SCP to {host}:{remote_path} succeeded."})
