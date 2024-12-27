@@ -63,3 +63,35 @@ document.addEventListener('DOMContentLoaded', () => {
             parent.appendChild(item);
         });
     }
+    
+    // Handle checkpoint file selection
+    let selectedCheckpoint = null;
+    function selectCheckpointFile(filePath) {
+        selectedCheckpoint = filePath;
+        console.log('Selected checkpoint file:', filePath);
+    }
+    
+    // Handle deployment
+    deployButton.addEventListener('click', async () => {
+        if (!selectedCheckpoint) {
+            alert('Please select a checkpoint file first.');
+            return;
+        }
+        const deployMethod = deployMethodSelect.value;
+        if (!deployMethod) {
+            alert('Please select a deployment method.');
+            return;
+        }
+        
+        let payload;
+        switch (deployMethod) {
+            case 'ftp':
+                payload = {
+                    method: 'ftp',
+                    file: selectedCheckpoint,
+                    server: document.getElementById('ftp-server').value,
+                    username: document.getElementById('ftp-username').value,
+                    password: document.getElementById('ftp-password').value,
+                    path: document.getElementById('ftp-path').value,
+                };
+                break;
