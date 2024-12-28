@@ -1,13 +1,15 @@
 {% extends 'base.html' %}
+
 {% block content %}
 <div class="container-fluid py-4">
-  
-  <!-- Runs List -->
+
+  <!-- Runs List Card -->
   <div class="card mb-3">
     <div class="card-header">
       <h3 class="card-title">Deploy - Runs List</h3>
     </div>
     <div class="card-body">
+      <!-- Table: Runs -->
       <table class="table table-striped">
         <thead>
           <tr>
@@ -28,25 +30,29 @@
     </div>
   </div>
 
-  <!-- Directory Explorer -->
+  <!-- Directory Explorer Card -->
   <div class="card mb-3">
     <div class="card-header">
       <h3 class="card-title">Directory Explorer</h3>
     </div>
     <div class="card-body">
+      <!-- Current Exploration Path -->
       <h5>Currently Exploring: <span id="id_explore_run_name"></span></h5>
       <hr/>
+      <!-- Directory Tree (Populated by deploy.js) -->
       <div id="id_directory_tree" style="max-height: 500px; overflow-y: auto;"></div>
     </div>
   </div>
 
-  <!-- Deployment Options -->
+  <!-- Deployment Methods Card -->
   <div class="card">
     <div class="card-header">
       <h3 class="card-title">Deployment Methods</h3>
     </div>
     <div class="card-body">
+      <!-- Selected File Display -->
       <p>Selected File: <code id="id_selected_file">None</code></p>
+      <!-- Deployment Buttons -->
       <div class="btn-group">
         <button type="button" class="btn btn-primary"
                 onclick="deploySelectedFile('download')">
@@ -64,52 +70,66 @@
     </div>
   </div>
 
-</div>
+</div> <!-- /.container-fluid -->
 
-<!-- Modal for SCP/FTP Credentials -->
+<!-- Modal: SCP/FTP Credentials -->
 <div class="modal fade" id="id_modal_credentials" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
 
+      <!-- Modal Header -->
       <div class="modal-header">
-        <h5 class="modal-title">Enter Credentials - <span id="id_modal_method_label"></span></h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"
+        <h5 class="modal-title">
+          Enter Credentials - <span id="id_modal_method_label"></span>
+        </h5>
+        <button type="button" class="btn-close"
+                data-bs-dismiss="modal"
                 aria-label="Close"></button>
       </div>
 
+      <!-- Modal Body -->
       <div class="modal-body">
+        <!-- Credentials Form -->
         <form id="id_form_credentials">
-
           <div class="mb-3">
             <label class="form-label">Host</label>
-            <input type="text" class="form-control" id="id_input_host" placeholder="example.com">
+            <input type="text" class="form-control"
+                   id="id_input_host" placeholder="example.com">
           </div>
 
           <div class="mb-3">
             <label class="form-label">Port</label>
-            <input type="number" class="form-control" id="id_input_port" value="22">
+            <input type="number" class="form-control"
+                   id="id_input_port" value="22">
           </div>
 
           <div class="mb-3">
             <label class="form-label">Username</label>
-            <input type="text" class="form-control" id="id_input_username">
+            <input type="text" class="form-control"
+                   id="id_input_username">
           </div>
 
           <div class="mb-3">
             <label class="form-label">Password</label>
-            <input type="password" class="form-control" id="id_input_password">
+            <input type="password" class="form-control"
+                   id="id_input_password">
           </div>
 
           <div class="mb-3">
             <label class="form-label">Remote Path</label>
-            <input type="text" class="form-control" id="id_input_remote_path"
+            <input type="text" class="form-control"
+                   id="id_input_remote_path"
                    placeholder="/tmp/deployed_model.pth">
           </div>
         </form>
       </div>
 
+      <!-- Modal Footer -->
       <div class="modal-footer">
-        <button type="button" class="btn btn-link" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-link"
+                data-bs-dismiss="modal">
+          Cancel
+        </button>
         <button type="button" class="btn btn-primary"
                 id="id_modal_credentials_ok">
           Deploy
@@ -119,5 +139,6 @@
   </div>
 </div>
 
+<!-- Deployment Script -->
 <script src="/static/src/deploy.js"></script>
 {% endblock %}
