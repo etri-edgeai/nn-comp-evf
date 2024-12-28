@@ -1,3 +1,31 @@
+"""
+Module: runs.py
+Description:
+This module provides API routes for managing runs in a Flask-based application. Runs represent 
+the execution of training, evaluation, or optimization tasks using a specific dataset, model, 
+and optional optimization strategy.
+
+Features:
+- Create, edit, delete, and list runs.
+- Start and stop runs with GPU allocation management.
+- Retrieve and manage run-specific files (e.g., `engine.py`, `config.yaml`).
+- Log management for monitoring the status of runs.
+
+Components:
+- GPUManager: A thread-safe utility for managing GPU allocation.
+- Flask Routes: APIs to handle CRUD operations for runs and execute tasks.
+
+Dependencies:
+- Flask: For HTTP request/response management.
+- Torch: For GPU detection and allocation.
+- YAML: For handling configuration files.
+- OS/Shutil: For file system operations.
+- Subprocess: For executing training scripts.
+- JSON: For storing and updating project metadata.
+
+Author: Junyong Park
+"""
+
 import os
 import json
 import shutil
