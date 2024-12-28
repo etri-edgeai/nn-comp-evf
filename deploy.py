@@ -60,6 +60,7 @@ def list_run_files():
 
     tree_data = get_directory_tree(base_dir)
     return jsonify({"tree": tree_data}), 200
+
 @deploy_bp.route('/transfer', methods=['GET', 'POST'])
 def deploy_transfer():
     """
@@ -113,6 +114,7 @@ def deploy_transfer():
             return ftp_file(data)
         else:
             return jsonify({"error": f"Unsupported method: {method}"}), 400
+
 def scp_file(payload):
     """
     Uses paramiko to SFTP upload a file. Expects:
@@ -141,6 +143,7 @@ def scp_file(payload):
         transport.close()
 
     return jsonify({"message": f"SCP to {host}:{remote_path} succeeded."})
+
 def ftp_file(payload):
     """
     Uses Python's ftplib to upload a file. Expects:
