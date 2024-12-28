@@ -1,15 +1,19 @@
 {% extends "base.html" %}
 
 {% block content %}
+<!-- Page Wrapper -->
 <div class="page-wrapper">
     <div class="container-fluid py-4">
+        <!-- Models Card -->
         <div class="card">
             <div class="card-header d-flex justify-content-between align-items-center">
                 <h3 class="card-title">Models</h3>
+                <!-- Button: Create Model -->
                 <button class="btn btn-primary" onclick="openCreateModel()">Create Model</button>
             </div>
             <div class="card-body">
                 <div class="table-responsive">
+                    <!-- Models Table -->
                     <table class="table table-hover">
                         <thead>
                             <tr>
@@ -21,7 +25,7 @@
                             </tr>
                         </thead>
                         <tbody id="id_table_body_models">
-                            <!-- Model items will be dynamically populated here -->
+                            <!-- Model items will be dynamically populated here via models.js -->
                         </tbody>
                     </table>
                 </div>
@@ -38,11 +42,15 @@
                 <h5 class="modal-title">Create Model</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
+
+            <!-- Modal Body -->
             <div class="modal-body">
+                <!-- Model Basic Info -->
                 <div class="row mb-3">
                     <div class="col-md-4">
                         <label class="form-label required">Model Name</label>
-                        <input id="id_model_name" type="text" class="form-control" placeholder="Enter model name" autocomplete="off">
+                        <input id="id_model_name" type="text" class="form-control"
+                               placeholder="Enter model name" autocomplete="off">
                     </div>
                     <div class="col-md-4">
                         <label class="form-label required">Model Type</label>
@@ -55,21 +63,27 @@
                     </div>
                     <div class="col-md-4">
                         <label class="form-label required">Model Architecture</label>
-                        <input id="id_model_architecture" type="text" class="form-control" placeholder="Enter architecture" autocomplete="off">
+                        <input id="id_model_architecture" type="text" class="form-control"
+                               placeholder="Enter architecture" autocomplete="off">
                     </div>
                 </div>
 
+                <!-- File/Folder Upload Controls -->
                 <div class="row mb-3">
                     <div class="col-12">
                         <div class="d-flex justify-content-between align-items-center">
                             <label class="form-label mb-0">Files</label>
                             <div>
+                                <!-- Hidden Inputs for File & Folder Upload -->
                                 <input type="file" id="file_upload" style="display: none;" multiple>
                                 <input type="file" id="folder_upload" style="display: none;" webkitdirectory directory>
-                                <button class="btn btn-sm btn-outline-primary me-2" onclick="$('#file_upload').click()">
+                                <!-- Buttons to Trigger File & Folder Uploads -->
+                                <button class="btn btn-sm btn-outline-primary me-2" 
+                                        onclick="$('#file_upload').click()">
                                     Upload File
                                 </button>
-                                <button class="btn btn-sm btn-outline-primary" onclick="$('#folder_upload').click()">
+                                <button class="btn btn-sm btn-outline-primary" 
+                                        onclick="$('#folder_upload').click()">
                                     Upload Folder
                                 </button>
                             </div>
@@ -77,6 +91,7 @@
                     </div>
                 </div>
 
+                <!-- Directory Tree & Code Editor -->
                 <div class="row">
                     <div class="col-3">
                         <div id="directory_tree" class="directory-tree"></div>
@@ -86,9 +101,15 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Modal Footer -->
             <div class="modal-footer">
-                <button type="button" class="btn btn-link link-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-primary" id="id_create_model_ok">Create Model</button>
+                <button type="button" class="btn btn-link link-secondary" data-bs-dismiss="modal">
+                    Cancel
+                </button>
+                <button type="button" class="btn btn-primary" id="id_create_model_ok">
+                    Create Model
+                </button>
             </div>
         </div>
     </div>
@@ -102,7 +123,10 @@
                 <h5 class="modal-title">Edit Model</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
+
+            <!-- Modal Body -->
             <div class="modal-body">
+                <!-- Model Basic Info (Read-only) -->
                 <div class="row mb-3">
                     <div class="col-md-4">
                         <label class="form-label required">Model Name</label>
@@ -122,6 +146,7 @@
                     </div>
                 </div>
 
+                <!-- Directory Tree & Code Editor for Editing -->
                 <div class="row">
                     <div class="col-3">
                         <div id="edit_directory_tree" class="directory-tree"></div>
@@ -131,35 +156,38 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Modal Footer -->
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-primary" id="id_edit_model_ok">Save Changes</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    Cancel
+                </button>
+                <button type="button" class="btn btn-primary" id="id_edit_model_ok">
+                    Save Changes
+                </button>
             </div>
         </div>
     </div>
 </div>
 
+<!-- Styles -->
 <style>
-    /* Table Styles */
+    /* Table Drag & Drop Styles */
     .drag-handle {
         cursor: move;
         color: #adb5bd;
         padding: 0.5rem;
         text-align: center;
     }
-    
     .drag-handle:hover {
         color: #6c757d;
     }
-    
     .drag-over {
         border: 2px dashed #0d6efd;
     }
-    
     tr[draggable="true"] {
         cursor: move;
     }
-    
     .table > tbody > tr > td {
         vertical-align: middle;
     }
@@ -173,7 +201,6 @@
         max-height: 500px;
         padding: 8px;
     }
-
     .tree-item {
         cursor: pointer;
         padding: 6px 8px;
@@ -185,17 +212,14 @@
         align-items: center;
         color: #d1d5db; /* Lighter text color for better visibility */
     }
-
     .tree-item:hover {
         background-color: #2e2e4f; /* Slightly lighter background on hover */
         color: #ffffff; /* White text on hover */
     }
-
     .tree-item.active {
         background-color: #4c4c6d; /* Highlighted background for active item */
         color: #ffffff; /* White text for active item */
     }
-
     .tree-toggle {
         cursor: pointer;
         width: 20px;
@@ -205,11 +229,9 @@
         margin-right: 4px;
         color: #a1a1b1; /* Subtle icon color */
     }
-
     .tree-toggle:hover {
         color: #ffffff; /* White icon on hover */
     }
-
     .tree-children {
         margin-left: 20px;
     }
@@ -223,6 +245,7 @@
     }
 </style>
 
+<!-- Open Create Model Modal Script -->
 <script>
     function openCreateModel() {
         const modal = $('#id_modal_create_model');
