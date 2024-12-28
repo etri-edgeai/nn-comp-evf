@@ -1,5 +1,7 @@
 $(document).ready(function () {
-    // Initialize editors
+    // =================================================
+    // ACE EDITOR INITIALIZATION
+    // =================================================
     const createEditor = ace.edit("editor");
     createEditor.setTheme("ace/theme/monokai");
     createEditor.setOptions({
@@ -20,9 +22,13 @@ $(document).ready(function () {
     document.getElementById("edit_editor").style.height = "500px";
     editEditor.resize();
 
-    // State variables
-    let currentCreateFile = null;
-    let currentEditFile = null;
+    // =================================================
+    // STATE VARIABLES
+    // =================================================
+    let currentCreateFile = null;  // Currently selected file in "create" mode
+    let currentEditFile   = null;  // Currently selected file in "edit" mode
+
+    // Directory structure for the temporary model folder
     let treeData = {
         'temp_models': {
             type: 'directory',
@@ -30,28 +36,38 @@ $(document).ready(function () {
         }
     };
 
-    // Helper Functions
+    // =================================================
+    // HELPER FUNCTIONS
+    // =================================================
+    // Determine Ace Editor mode from file extension
     function setEditorMode(editor, path) {
         const fileExtension = path.split('.').pop().toLowerCase();
         const modeMap = {
-            'py': 'python',
+            'py':   'python',
             'yaml': 'yaml',
-            'yml': 'yaml',
+            'yml':  'yaml',
             'json': 'json',
-            'js': 'javascript',
+            'js':   'javascript',
             'html': 'html',
-            'css': 'css'
+            'css':  'css'
         };
         editor.session.setMode(`ace/mode/${modeMap[fileExtension] || 'text'}`);
     }
 
-    function updateDirectoryTree(containerId = 'directory_tree', data = treeData, clickHandler = loadFileContent) {
+    // Generate directory tree UI
+    function updateDirectoryTree(
+        containerId = 'directory_tree',
+        data       = treeData,
+        clickHandler = loadFileContent
+    ) {
         const $tree = $(`#${containerId}`);
         $tree.empty();
-        
+
+        // Render the tree recursively
         function renderTree(treeData, basePath = '', level = 0) {
             let html = '';
-            
+
+            // Sort directories before files, and sort by name
             const entries = Object.entries(treeData).sort((a, b) => {
                 const aIsDir = a[1].type === 'directory';
                 const bIsDir = b[1].type === 'directory';
@@ -60,13 +76,16 @@ $(document).ready(function () {
                 return a[0].localeCompare(b[0]);
             });
 
+            // Build HTML for each entry
             entries.forEach(([name, item]) => {
                 const currentPath = basePath ? `${basePath}/${name}` : name;
                 const indent = level * 20;
-                
+
                 if (item.type === 'directory') {
                     html += `
-                        <div class="tree-item directory" style="padding-left: ${indent}px" data-path="${currentPath}">
+                        <div class="tree-item directory"
+                             style="padding-left: ${indent}px"
+                             data-path="${currentPath}">
                             <span class="tree-toggle">►</span>
                             <span class="tree-label">📁 ${name}</span>
                         </div>
@@ -76,47 +95,57 @@ $(document).ready(function () {
                     `;
                 } else {
                     html += `
-                        <div class="tree-item file" style="padding-left: ${indent}px" data-path="${currentPath}">
+                        <div class="tree-item file"
+                             style="padding-left: ${indent}px"
+                             data-path="${currentPath}">
                             <span class="tree-label">📄 ${name}</span>
                         </div>
                     `;
                 }
             });
-            
             return html;
         }
 
+        // Insert generated HTML
         $tree.html(renderTree(data));
 
-        $tree.find('.tree-item.directory .tree-toggle').off('click').on('click', function(e) {
-            e.stopPropagation();
-            const $parent = $(this).closest('.directory');
-            const $children = $parent.next('.tree-children');
-            
-            if ($children.is(':visible')) {
-                $(this).html('►');
-                $children.slideUp(100);
-            } else {
-                $(this).html('▼');
-                $children.slideDown(100);
-            }
-        });
+        // Directory toggle (expand/collapse)
+        $tree.find('.tree-item.directory .tree-toggle')
+            .off('click')
+            .on('click', function(e) {
+                e.stopPropagation();
+                const $parent    = $(this).closest('.directory');
+                const $children  = $parent.next('.tree-children');
 
-        $tree.find('.tree-item.file').off('click').on('click', function() {
-            const path = $(this).data('path');
-            $('.tree-item').removeClass('active');
-            $(this).addClass('active');
-            clickHandler(path);
-        });
+                if ($children.is(':visible')) {
+                    $(this).html('►');
+                    $children.slideUp(100);
+                } else {
+                    $(this).html('▼');
+                    $children.slideDown(100);
+                }
+            });
+
+        // File click handler
+        $tree.find('.tree-item.file')
+            .off('click')
+            .on('click', function() {
+                const path = $(this).data('path');
+                $('.tree-item').removeClass('active');
+                $(this).addClass('active');
+                clickHandler(path);
+            });
     }
 
-    // File Operations
+    // =================================================
+    // FILE OPERATIONS: LOADING FILES INTO EDITORS
+    // =================================================
     async function loadCreateModelContent(path) {
         try {
             const response = await fetch('/models/get_temp_file', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ 
+                body: JSON.stringify({
                     path: path.replace(/\\/g, '/'),
                     project_name: sessionStorage.getItem('project_name')
                 })
@@ -141,7 +170,7 @@ $(document).ready(function () {
             const response = await fetch('/models/get_model_file', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ 
+                body: JSON.stringify({
                     path: path,
                     project_name: sessionStorage.getItem('project_name')
                 })
@@ -161,6 +190,7 @@ $(document).ready(function () {
         }
     }
 
+    // Decide which editor to populate based on which modal is open
     async function loadFileContent(path) {
         const isEditMode = $('#id_modal_edit_model').is(':visible');
         if (isEditMode) {
@@ -170,6 +200,9 @@ $(document).ready(function () {
         }
     }
 
+    // =================================================
+    // FILE UPLOAD
+    // =================================================
     async function handleFileUpload(formData) {
         try {
             const response = await fetch('/models/upload_temp_files', {
@@ -191,14 +224,16 @@ $(document).ready(function () {
         }
     }
 
-    // Model List Management
+    // =================================================
+    // MODEL LIST MANAGEMENT
+    // =================================================
     async function loadModelList() {
         try {
             const response = await fetch('/models/list', {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ 
-                    project_name: sessionStorage.getItem('project_name') 
+                body: JSON.stringify({
+                    project_name: sessionStorage.getItem('project_name')
                 })
             });
 
@@ -227,7 +262,8 @@ $(document).ready(function () {
             $tableBody.append(`
                 <tr draggable="true" data-index="${index}" data-name="${model.model_name}">
                     <td class="drag-handle">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24"
+                             viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none">
                             <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
                             <line x1="4" y1="6" x2="20" y2="6" />
                             <line x1="4" y1="12" x2="20" y2="12" />
@@ -238,8 +274,14 @@ $(document).ready(function () {
                     <td>${model.model_type}</td>
                     <td>${model.model_architecture}</td>
                     <td>
-                        <button class="btn btn-sm btn-warning me-2" onclick="editModel('${model.model_name}')">Edit</button>
-                        <button class="btn btn-sm btn-danger" onclick="deleteModel('${model.model_name}')">Delete</button>
+                        <button class="btn btn-sm btn-warning me-2"
+                                onclick="editModel('${model.model_name}')">
+                            Edit
+                        </button>
+                        <button class="btn btn-sm btn-danger"
+                                onclick="deleteModel('${model.model_name}')">
+                            Delete
+                        </button>
                     </td>
                 </tr>
             `);
@@ -248,10 +290,13 @@ $(document).ready(function () {
         initDragAndDrop();
     }
 
-    // Event Handlers
+    // =================================================
+    // MODAL EVENT HANDLERS
+    // =================================================
+    // "Create Model" Modal: on show
     $('#id_modal_create_model').on('show.bs.modal', async function () {
         try {
-            // First ensure temp_models is cleared
+            // Clear the temp folder
             const clearResponse = await fetch('/models/clear_temp', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -265,7 +310,7 @@ $(document).ready(function () {
                 return;
             }
 
-            // Then initialize with fresh template files
+            // Initialize with fresh template files
             const initResponse = await fetch('/models/init_temp_folder', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -280,11 +325,12 @@ $(document).ready(function () {
                 $('#id_model_name').val('');
                 $('#id_model_type').val('');
                 $('#id_model_architecture').val('');
-                
-                // Update tree with new data
+
+                // Build the directory tree
                 treeData = data.tree_data;
                 updateDirectoryTree('directory_tree', treeData, loadCreateModelContent);
-                
+
+                // Load the initial file if provided
                 if (data.initial_file) {
                     await loadCreateModelContent(data.initial_file);
                 }
@@ -297,13 +343,13 @@ $(document).ready(function () {
         }
     });
 
-
+    // "Create Model" Modal: on hide
     $('#id_modal_create_model').on('hidden.bs.modal', async function() {
         try {
             // Clear editor content
             createEditor.setValue('');
             currentCreateFile = null;
-            
+
             // Remove temp_models directory
             const response = await fetch('/models/clear_temp', {
                 method: 'POST',
@@ -321,16 +367,21 @@ $(document).ready(function () {
         }
     });
 
+    // "Edit Model" Modal: on hide
     $('#id_modal_edit_model').on('hidden.bs.modal', function() {
         editEditor.setValue('');
         currentEditFile = null;
     });
 
+    // =================================================
+    // CREATE / SAVE MODEL
+    // =================================================
     $('#id_create_model_ok').click(async function() {
-        const modelName = $('#id_model_name').val();
-        const modelType = $('#id_model_type').val();
-        const modelArchitecture = $('#id_model_architecture').val();
+        const modelName          = $('#id_model_name').val();
+        const modelType          = $('#id_model_type').val();
+        const modelArchitecture  = $('#id_model_architecture').val();
 
+        // Simple validation
         if (!modelName || !modelType || !modelArchitecture) {
             toastr.error("Please fill in all required fields");
             return;
@@ -394,7 +445,9 @@ $(document).ready(function () {
         }
     });
 
-    // File Upload Event Handlers
+    // =================================================
+    // FILE UPLOAD: HANDLING FILE/FOLDER SELECTION
+    // =================================================
     $('#file_upload, #folder_upload').on('change', function(e) {
         const files = e.target.files;
         if (files.length === 0) return;
@@ -410,7 +463,9 @@ $(document).ready(function () {
         this.value = ''; // Reset file input
     });
 
-    // Edit and Delete Model Functions
+    // =================================================
+    // EDIT & DELETE MODEL (GLOBAL FUNCTIONS)
+    // =================================================
     window.editModel = async function(modelName) {
         try {
             const response = await fetch('/models/get_model_structure', {
@@ -424,12 +479,15 @@ $(document).ready(function () {
 
             const data = await response.json();
             if (!data.error) {
+                // Build the directory tree for editing
                 updateDirectoryTree('edit_directory_tree', data.tree_data, loadEditModelContent);
-                
+
+                // Load initial file, if any
                 if (data.initial_file) {
                     await loadEditModelContent(data.initial_file);
                 }
-                
+
+                // Show the modal
                 $('#id_edit_model_name').val(modelName);
                 $('#id_modal_edit_model').modal('show');
             } else {
@@ -450,9 +508,9 @@ $(document).ready(function () {
             const response = await fetch('/models/delete', {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ 
-                    name: modelName, 
-                    project_name: sessionStorage.getItem('project_name') 
+                body: JSON.stringify({
+                    name: modelName,
+                    project_name: sessionStorage.getItem('project_name')
                 })
             });
 
@@ -469,6 +527,9 @@ $(document).ready(function () {
         }
     };
 
+    // =================================================
+    // DRAG AND DROP FOR MODEL TABLE REORDER
+    // =================================================
     function initDragAndDrop() {
         const rows = document.querySelectorAll('#id_table_body_models tr');
         let draggedRow = null;
@@ -480,9 +541,9 @@ $(document).ready(function () {
                 e.dataTransfer.effectAllowed = 'move';
             });
 
-            row.addEventListener('dragend', function(e) {
+            row.addEventListener('dragend', function() {
                 this.style.opacity = '1';
-                rows.forEach(row => row.classList.remove('drag-over'));
+                rows.forEach(r => r.classList.remove('drag-over'));
             });
 
             row.addEventListener('dragover', function(e) {
@@ -490,11 +551,11 @@ $(document).ready(function () {
                 e.dataTransfer.dropEffect = 'move';
             });
 
-            row.addEventListener('dragenter', function(e) {
+            row.addEventListener('dragenter', function() {
                 this.classList.add('drag-over');
             });
 
-            row.addEventListener('dragleave', function(e) {
+            row.addEventListener('dragleave', function() {
                 this.classList.remove('drag-over');
             });
 
@@ -506,12 +567,14 @@ $(document).ready(function () {
                 const draggedIndex = allRows.indexOf(draggedRow);
                 const droppedIndex = allRows.indexOf(this);
 
+                // Reorder rows in DOM
                 if (draggedIndex < droppedIndex) {
                     this.parentNode.insertBefore(draggedRow, this.nextSibling);
                 } else {
                     this.parentNode.insertBefore(draggedRow, this);
                 }
 
+                // Save new order to server
                 saveNewOrder();
             });
         });
@@ -543,7 +606,9 @@ $(document).ready(function () {
         }
     }
 
-    // Initialize the page
-    loadModelList();
-    updateDirectoryTree();
+    // =================================================
+    // INITIALIZE PAGE
+    // =================================================
+    loadModelList();           // Load existing models
+    updateDirectoryTree();     // Initialize empty tree
 });
