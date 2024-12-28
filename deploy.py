@@ -1,11 +1,33 @@
+"""
+Module: deploy.py
+Description:
+This module handles the deployment of files, including listing run directories, downloading files, 
+and transferring files using SCP or FTP. It provides a secure interface for managing deployment 
+within a Flask-based application.
+
+Features:
+- Render a deployment page.
+- List directory trees for project runs.
+- Download files directly from the server.
+- Transfer files to remote servers using SCP or FTP.
+
+Dependencies:
+- Flask: For route handling and request/response management.
+- Paramiko: For SCP/SFTP file transfers.
+- ftplib: For FTP file transfers.
+- os, json: For file system operations and JSON parsing.
+
+Author: Junyong Park
+"""
+
 import os
 import json
-import paramiko        # pip install paramiko
+import paramiko  # pip install paramiko
 from ftplib import FTP
 from flask import Blueprint, request, session, send_file, jsonify, abort, render_template
-from auth import session_required  # or your own session auth
+from auth import session_required  # Import your session management decorator
 
-# Initialize Blueprint
+# Initialize Blueprint for deployment-related routes
 deploy_bp = Blueprint('deploy', __name__)
 
 @deploy_bp.route('/', methods=['GET'])
@@ -13,7 +35,6 @@ def show_deploy():
     """
     Renders the Deploy page at /deploy/.
     """
-    # In your real code, use @session_required or similar if you have auth
     if 'user' not in session:
         return abort(401, description="Unauthorized - user not in session")
     return render_template('deploy.html')
@@ -22,7 +43,7 @@ def show_deploy():
 def list_run_files():
     """
     Returns a JSON directory tree for the run.
-    GET /deploy/list_run_files?project_name=...&run_name=...
+    Endpoint: GET /deploy/list_run_files?project_name=...&run_name=...
     """
     if 'user' not in session:
         return abort(401, description="Unauthorized")
@@ -64,26 +85,23 @@ def list_run_files():
 @deploy_bp.route('/transfer', methods=['GET', 'POST'])
 def deploy_transfer():
     """
-    Two possible flows:
-    1) GET /deploy/transfer?method=download&file=... => triggers direct download
-    2) POST /deploy/transfer (JSON or form-data):
-       {
-         "method": "scp" or "ftp",
-         "file": "/abs/path/to/file",
-         "host": "...",
-         "port": 22,
-         "username": "...",
-         "password": "...",
-         "remote_path": "..."
-       }
+    Handles file transfers via download (GET) or SCP/FTP upload (POST).
+    GET /deploy/transfer?method=download&file=...
+    POST /deploy/transfer:
+    {
+        "method": "scp" or "ftp",
+        "file": "/abs/path/to/file",
+        "host": "...",
+        "port": 22 or 21,
+        "username": "...",
+        "password": "...",
+        "remote_path": "..."
+    }
     """
     if 'user' not in session:
         return abort(401, description="Unauthorized")
 
-    user = session['user']
-
     if request.method == 'GET':
-        # Expecting ?method=download & file=
         method = request.args.get("method")
         file_path = request.args.get("file")
         if method != "download":
@@ -92,7 +110,7 @@ def deploy_transfer():
             return abort(404, description="File not found for download.")
         return send_file(file_path, as_attachment=True)
 
-    else:  # POST
+    elif request.method == 'POST':
         data = request.get_json() or {}
         method = data.get("method")
         file_path = data.get("file")
@@ -101,12 +119,6 @@ def deploy_transfer():
             return jsonify({"error": "Missing 'method' or 'file' in request."}), 400
         if not os.path.exists(file_path):
             return jsonify({"error": f"File not found: {file_path}"}), 404
-
-        # For safety, ensure file_path is within user's workspace
-        # safe_base = os.path.abspath(os.path.join('workspace', user))
-        # safe_target = os.path.abspath(file_path)
-        # if not safe_target.startswith(safe_base):
-        #    return jsonify({"error": "File path outside workspace."}), 403
 
         if method == "scp":
             return scp_file(data)
@@ -117,21 +129,22 @@ def deploy_transfer():
 
 def scp_file(payload):
     """
-    Uses paramiko to SFTP upload a file. Expects:
+    Transfers a file via SCP using Paramiko.
+    Payload:
     {
       "file": "/local/path",
       "host": "...",
       "port": 22,
       "username": "...",
       "password": "...",
-      "remote_path": "/destination/path/filename"
+      "remote_path": "/remote/path/filename"
     }
     """
-    file_path   = payload["file"]
-    host        = payload.get("host", "localhost")
-    port        = int(payload.get("port", 22))
-    username    = payload.get("username", "")
-    password    = payload.get("password", "")
+    file_path = payload["file"]
+    host = payload.get("host", "localhost")
+    port = int(payload.get("port", 22))
+    username = payload.get("username", "")
+    password = payload.get("password", "")
     remote_path = payload.get("remote_path", "/tmp/deployed_model.pth")
 
     transport = paramiko.Transport((host, port))
@@ -146,7 +159,8 @@ def scp_file(payload):
 
 def ftp_file(payload):
     """
-    Uses Python's ftplib to upload a file. Expects:
+    Transfers a file via FTP.
+    Payload:
     {
       "file": "/local/path",
       "host": "...",
@@ -156,17 +170,13 @@ def ftp_file(payload):
       "remote_path": "filename or subdir/filename"
     }
     """
-    file_path   = payload["file"]
-    host        = payload.get("host", "localhost")
-    port        = int(payload.get("port", 21))
-    username    = payload.get("username", "")
-    password    = payload.get("password", "")
-    remote_path = payload.get("remote_path", None)  # e.g. "some_subdir/model.pth"
+    file_path = payload["file"]
+    host = payload.get("host", "localhost")
+    port = int(payload.get("port", 21))
+    username = payload.get("username", "")
+    password = payload.get("password", "")
+    remote_path = payload.get("remote_path", None)
 
-    # We'll parse out subdir if present
-    # e.g. remote_path="some_subdir/model.pth"
-    # Then subdir="some_subdir", filename="model.pth"
-    # For simplicity, if there's a slash, we try to cd into that subdir
     ftp_filename = os.path.basename(remote_path) if remote_path else os.path.basename(file_path)
     ftp_subdir = os.path.dirname(remote_path) if remote_path else ""
 
@@ -177,7 +187,6 @@ def ftp_file(payload):
             try:
                 ftp.cwd(ftp_subdir)
             except:
-                # create directory if needed (optional)
                 ftp.mkd(ftp_subdir)
                 ftp.cwd(ftp_subdir)
 
@@ -185,4 +194,3 @@ def ftp_file(payload):
             ftp.storbinary(f"STOR {ftp_filename}", f)
 
     return jsonify({"message": f"FTP to {host}:{remote_path or ftp_filename} succeeded."})
-
