@@ -1,14 +1,14 @@
 {% extends "base.html" %}
 
 {% block content %}
-<!-- //page content begin -->
+<!-- Page Content Start -->
 <div class="page-wrapper">
     <div class="container-xl">
-        <!-- Page title -->
+        <!-- Page Title Section -->
         <div class="page-header d-print-none">
             <div class="row g-2 align-items-center">
                 <div class="col">
-                    <!-- Page pre-title -->
+                    <!-- Optional Subtitle or Breadcrumb -->
                     <div class="page-pretitle">
                         Dashboard
                     </div>
@@ -16,16 +16,23 @@
             </div>
         </div>
     </div>
+
+    <!-- Main Page Body -->
     <div class="page-body">
         <div class="container-xl">
             <div class="row row-deck row-cards">
                 <div class="col-lg-12">
                     <div class="card">
                         <div class="card-body">
-                            <h3 class="card-title"><span class="badge bg-green">Node:1</span></h3>
                             
-                            <!-- CPU and Memory -->
+                            <!-- Node Title/Badge -->
+                            <h3 class="card-title">
+                                <span class="badge bg-green">Node:1</span>
+                            </h3>
+
+                            <!-- CPU Usage Row -->
                             <div class="row">
+                                <!-- CPU Usage Percentage -->
                                 <div class="col-lg-6">
                                     <div class="card">
                                         <div class="card-body">
@@ -36,11 +43,15 @@
                                                 <div class="h2">{{ cpu*100 }}%</div>
                                             </div>
                                             <div class="progress">
-                                                <div class="progress-bar bg-info" role="progressbar" style="width: {{ cpu*100 }}%"></div>
+                                                <div class="progress-bar bg-info" role="progressbar"
+                                                     style="width: {{ cpu*100 }}%">
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
+
+                                <!-- CPU Memory Usage -->
                                 <div class="col-lg-6">
                                     <div class="card">
                                         <div class="card-body">
@@ -51,16 +62,19 @@
                                                 <div class="h2">{{ cpu_mem }}%</div>
                                             </div>
                                             <div class="progress">
-                                                <div class="progress-bar bg-info" role="progressbar" style="width: {{ cpu_mem }}%"></div>
+                                                <div class="progress-bar bg-info" role="progressbar"
+                                                     style="width: {{ cpu_mem }}%">
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            </div><!-- End CPU Usage Row -->
 
-                            <!-- GPU and GPU Memory in Pairs -->
+                            <!-- GPU Usage: Loop through each GPU -->
                             {% for i in range(0, num_gpus) %}
                             <div class="row">
+                                <!-- GPU Utilization Percentage -->
                                 <div class="col-lg-6">
                                     <div class="card">
                                         <div class="card-body">
@@ -71,11 +85,15 @@
                                                 <div class="h2">{{ gpus[i][0]*100 }}%</div>
                                             </div>
                                             <div class="progress">
-                                                <div class="progress-bar bg-info" role="progressbar" style="width: {{ gpus[i][0]*100 }}%"></div>
+                                                <div class="progress-bar bg-info" role="progressbar"
+                                                     style="width: {{ gpus[i][0]*100 }}%">
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
+
+                                <!-- GPU Memory Usage -->
                                 <div class="col-lg-6">
                                     <div class="card">
                                         <div class="card-body">
@@ -86,20 +104,22 @@
                                                 <div class="h2">{{ gpus[i][1] }}%</div>
                                             </div>
                                             <div class="progress">
-                                                <div class="progress-bar bg-info" role="progressbar" style="width: {{ gpus[i][1] }}%"></div>
+                                                <div class="progress-bar bg-info" role="progressbar"
+                                                     style="width: {{ gpus[i][1] }}%">
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            </div><!-- End GPU Row -->
                             {% endfor %}
-                            
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-<!-- //page content end -->
+
+                        </div><!-- /.card-body -->
+                    </div><!-- /.card -->
+                </div><!-- /.col-lg-12 -->
+            </div><!-- /.row -->
+        </div><!-- /.container-xl -->
+    </div><!-- /.page-body -->
+</div><!-- /.page-wrapper -->
+<!-- Page Content End -->
 {% endblock %}
