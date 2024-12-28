@@ -1,3 +1,26 @@
+"""
+Module: dataset.py
+Description:
+This module provides routes and functionality for managing datasets in a Flask-based application.
+It includes API endpoints for loading, saving, listing, deleting, and reordering datasets. 
+User-specific operations are managed based on active session data.
+
+Features:
+- Load dataset templates for initialization.
+- Save user-modified datasets to their project workspace.
+- List all datasets associated with a specific project.
+- Reorder datasets within a project.
+- Delete individual datasets or all datasets for a project.
+- Load dataset configurations and scripts for editing.
+
+Dependencies:
+- Flask: For web routing and handling HTTP requests.
+- JSON: For reading and writing dataset metadata.
+- os, shutil: For file and directory operations.
+- auth: For session-based user authentication and validation.
+
+Author: Junyong Park
+"""
 import os
 import json
 import shutil
