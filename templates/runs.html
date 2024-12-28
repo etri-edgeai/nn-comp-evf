@@ -1,13 +1,21 @@
 {% extends 'base.html' %}
+
 {% block content %}
+<!-- Page Wrapper -->
 <div class="page-wrapper">
     <div class="container-fluid py-4">
+        <!-- Runs Card -->
         <div class="card">
             <div class="card-header d-flex justify-content-between align-items-center">
                 <h3 class="card-title">Runs</h3>
-                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#id_modal_create_run">Create Run</button>
+                <button class="btn btn-primary"
+                        data-bs-toggle="modal"
+                        data-bs-target="#id_modal_create_run">
+                    Create Run
+                </button>
             </div>
             <div class="card-body">
+                <!-- Table of Runs -->
                 <div class="table-responsive">
                     <table class="table">
                         <thead>
@@ -27,10 +35,17 @@
                         </tbody>
                     </table>
                 </div>
-                <div id="logs_container"class="theme-dark" style="height: 500px; overflow-y: scroll; ; padding: 10px; border: 1px solid #ccc;">
-                    <div id="logs_content" style="font-family: 'Courier New', monospace; color: white;"></div>
+
+                <!-- Logs Container -->
+                <div id="logs_container"
+                     class="theme-dark"
+                     style="height: 500px; overflow-y: scroll; padding: 10px; border: 1px solid #ccc;">
+                    <div id="logs_content"
+                         style="font-family: 'Courier New', monospace; color: white;">
+                    </div>
                 </div>
-                
+
+                <!-- Inline Style: log-line for output formatting -->
                 <style>
                     .log-line {
                         display: block;
@@ -45,24 +60,46 @@
 </div>
 
 <!-- Create Run Modal -->
-<div class="modal fade" id="id_modal_create_run" tabindex="-1" aria-labelledby="createRunModalLabel" aria-hidden="true">
+<div class="modal fade"
+     id="id_modal_create_run"
+     tabindex="-1"
+     aria-labelledby="createRunModalLabel"
+     aria-hidden="true">
     <div class="modal-dialog modal-xl modal-dialog-centered">
         <div class="modal-content">
+            <!-- Modal Header -->
             <div class="modal-header">
                 <h5 class="modal-title">Create Run</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Close"></button>
             </div>
+
+            <!-- Modal Body -->
             <div class="modal-body">
-                <!-- Form inputs -->
+                <!-- Form Inputs: Run Name, Number of GPUs, etc. -->
                 <div class="row mb-3">
                     <div class="col-md-6">
                         <label class="form-label required">Run Name</label>
-                        <input id="id_run_name" type="text" class="form-control" placeholder="Enter run name" autocomplete="off">
+                        <input id="id_run_name"
+                               type="text"
+                               class="form-control"
+                               placeholder="Enter run name"
+                               autocomplete="off">
                     </div>
                     <div class="col-md-6">
                         <label class="form-label required">Number of GPUs</label>
-                        <input id="id_num_gpus" type="number" class="form-control" min="1" max="{{ gpu_count }}" value="1">
-                        <small class="form-text text-muted">Available GPUs: <span id="id_gpu_count">{{ gpu_count }}</span></small>
+                        <input id="id_num_gpus"
+                               type="number"
+                               class="form-control"
+                               min="1"
+                               max="{{ gpu_count }}"
+                               value="1">
+                        <small class="form-text text-muted">
+                            Available GPUs:
+                            <span id="id_gpu_count">{{ gpu_count }}</span>
+                        </small>
                     </div>
                 </div>
                 <div class="row mb-3">
@@ -70,131 +107,199 @@
                         <label class="form-label required">Model</label>
                         <select id="id_select_model" class="form-select">
                             <option value="">Select a Model</option>
-                            <!-- Options will be populated dynamically -->
+                            <!-- Options populated dynamically -->
                         </select>
                     </div>
                     <div class="col-md-4">
                         <label class="form-label required">Dataset</label>
                         <select id="id_select_dataset" class="form-select">
                             <option value="">Select a Dataset</option>
-                            <!-- Options will be populated dynamically -->
+                            <!-- Options populated dynamically -->
                         </select>
                     </div>
                     <div class="col-md-4">
                         <label class="form-label required">Optimization</label>
                         <select id="id_select_optimization" class="form-select">
                             <option value="">Select an Optimization</option>
-                            <!-- Options will be populated dynamically -->
+                            <!-- Options populated dynamically -->
                         </select>
                     </div>
                 </div>
 
                 <!-- Generate Engine Code Button -->
                 <div class="mb-3">
-                    <button id="id_generate_engine_code" type="button" class="btn btn-secondary" disabled>Generate Basic Engine Code</button>
+                    <button id="id_generate_engine_code"
+                            type="button"
+                            class="btn btn-secondary"
+                            disabled>
+                        Generate Basic Engine Code
+                    </button>
                 </div>
 
-                <!-- Buttons moved above the editor tabs -->
+                <!-- Buttons above the Editor Tabs -->
                 <div class="mb-3 d-flex justify-content-end">
-                    <button type="button" class="btn btn-link me-2" data-bs-dismiss="modal">Cancel</button>
-                    <button id="id_create_run_ok" type="button" class="btn btn-primary">Create Run</button>
+                    <button type="button"
+                            class="btn btn-link me-2"
+                            data-bs-dismiss="modal">
+                        Cancel
+                    </button>
+                    <button id="id_create_run_ok"
+                            type="button"
+                            class="btn btn-primary">
+                        Create Run
+                    </button>
                 </div>
 
-                <!-- Tabs for engine.py and config.yaml -->
+                <!-- Tabs: engine.py / config.yaml -->
                 <ul class="nav nav-tabs" role="tablist">
                     <li class="nav-item">
-                        <a class="nav-link active" data-bs-toggle="tab" href="#tab_engine_py" role="tab">engine.py</a>
+                        <a class="nav-link active"
+                           data-bs-toggle="tab"
+                           href="#tab_engine_py"
+                           role="tab">
+                            engine.py
+                        </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" data-bs-toggle="tab" href="#tab_config_yaml" role="tab">config.yaml</a>
+                        <a class="nav-link"
+                           data-bs-toggle="tab"
+                           href="#tab_config_yaml"
+                           role="tab">
+                            config.yaml
+                        </a>
                     </li>
                 </ul>
-                
+
+                <!-- Tab Contents -->
                 <div class="tab-content mt-3">
-                    <div class="tab-pane fade show active" id="tab_engine_py" role="tabpanel">
+                    <!-- engine.py Tab -->
+                    <div class="tab-pane fade show active"
+                         id="tab_engine_py"
+                         role="tabpanel">
                         <div id="editor_engine_py" class="editor"></div>
                     </div>
-                    <div class="tab-pane fade" id="tab_config_yaml" role="tabpanel">
+                    <!-- config.yaml Tab -->
+                    <div class="tab-pane fade"
+                         id="tab_config_yaml"
+                         role="tabpanel">
                         <div id="editor_config_yaml" class="editor"></div>
                     </div>
                 </div>
-            </div>
+            </div><!-- /.modal-body -->
         </div>
     </div>
 </div>
 
 <!-- Edit Run Modal -->
-<div class="modal fade" id="id_modal_edit_run" tabindex="-1" aria-labelledby="editRunModalLabel" aria-hidden="true">
+<div class="modal fade"
+     id="id_modal_edit_run"
+     tabindex="-1"
+     aria-labelledby="editRunModalLabel"
+     aria-hidden="true">
     <div class="modal-dialog modal-xl modal-dialog-centered">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Edit Run</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <div class="modal-content">
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Run</h5>
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="modal-body">
+                <!-- Read-only Fields, etc. -->
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <label>Run Name</label>
+                        <div id="id_edit_run_name"
+                             class="form-control-plaintext border-bottom">
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <label>Number of GPUs</label>
+                        <div id="id_edit_num_gpus"
+                             class="form-control-plaintext border-bottom">
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <label>Model</label>
+                        <div id="id_edit_model"
+                             class="form-control-plaintext border-bottom">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Additional fields for dataset, optimization, etc. -->
+                <ul class="nav nav-tabs">
+                    <li class="nav-item">
+                        <a class="nav-link active"
+                           data-bs-toggle="tab"
+                           href="#tab_engine_py"
+                           role="tab">
+                            engine.py
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link"
+                           data-bs-toggle="tab"
+                           href="#tab_config_yaml"
+                           role="tab">
+                            config.yaml
+                        </a>
+                    </li>
+                </ul>
+
+                <!-- Tab Contents -->
+                <div class="tab-content mt-3">
+                    <!-- engine.py Tab -->
+                    <div class="tab-pane fade show active"
+                         id="tab_engine_py">
+                        <div id="editor_edit_engine_py" class="editor"></div>
+                    </div>
+                    <!-- config.yaml Tab -->
+                    <div class="tab-pane fade"
+                         id="tab_config_yaml">
+                        <div id="editor_edit_config_yaml" class="editor"></div>
+                    </div>
+                </div>
+            </div><!-- /.modal-body -->
+
+            <!-- Modal Footer -->
+            <div class="modal-footer">
+                <!-- The key: id_save_edit_run in the button ID -->
+                <button type="button"
+                        class="btn btn-link"
+                        data-bs-dismiss="modal">
+                    Cancel
+                </button>
+                <button id="id_save_edit_run"
+                        type="button"
+                        class="btn btn-primary">
+                    Save Changes
+                </button>
+            </div>
         </div>
-        
-        <div class="modal-body">
-          <!-- read-only fields, etc. -->
-          <div class="row mb-3">
-            <div class="col-md-4">
-              <label>Run Name</label>
-              <div id="id_edit_run_name" class="form-control-plaintext border-bottom"></div>
-            </div>
-            <div class="col-md-4">
-              <label>Number of GPUs</label>
-              <div id="id_edit_num_gpus" class="form-control-plaintext border-bottom"></div>
-            </div>
-            <div class="col-md-4">
-              <label>Model</label>
-              <div id="id_edit_model" class="form-control-plaintext border-bottom"></div>
-            </div>
-          </div>
-          
-          <!-- etc. dataset, optimization, tabs for engine.py/config.yaml -->
-          <ul class="nav nav-tabs">
-            <li class="nav-item">
-              <a class="nav-link active" data-bs-toggle="tab" href="#tab_engine_py" role="tab">engine.py</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" data-bs-toggle="tab" href="#tab_config_yaml" role="tab">config.yaml</a>
-            </li>
-          </ul>
-          
-          <div class="tab-content mt-3">
-            <div class="tab-pane fade show active" id="tab_engine_py">
-              <div id="editor_edit_engine_py" class="editor"></div>
-            </div>
-            <div class="tab-pane fade" id="tab_config_yaml">
-              <div id="editor_edit_config_yaml" class="editor"></div>
-            </div>
-          </div>
-        </div>
-  
-        <div class="modal-footer">
-          <!-- The key: id_save_edit_run in the button ID -->
-          <button type="button" class="btn btn-link" data-bs-dismiss="modal">Cancel</button>
-          <button id="id_save_edit_run" type="button" class="btn btn-primary">Save Changes</button>
-        </div>
-      </div>
     </div>
-  </div>
-  
+</div>
 
+<!-- Additional Styles -->
 <style>
+    /* Dark Theme Logs Container */
     .theme-dark #logs_container {
-    height: 500px;
-    overflow-y: scroll;
-    background-color: #1a1f24;
-    padding: 10px;
-    border: 1px solid #2c3338;
-    margin-top: 20px;
+        height: 500px;
+        overflow-y: scroll;
+        background-color: #1a1f24;
+        padding: 10px;
+        border: 1px solid #2c3338;
+        margin-top: 20px;
     }
-
     .theme-dark #logs_content {
         color: #f1f5f9;
         white-space: pre-wrap;
         word-wrap: break-word;
     }
-
     .theme-dark .log-line {
         display: block;
         white-space: pre;
@@ -202,31 +307,31 @@
         min-height: 1.5em;
     }
 
+    /* Code Editor Size */
     .editor {
         width: 100%;
-        /* Fixed height so it won't grow infinitely */
-        height: 400px;      
-        /* Let it scroll inside if content is tall */
-        /* overflow: auto;   */
+        height: 400px; /* Fixed height so it won't grow infinitely */
     }
+
+    /* Form Control Plaintext */
     .form-control-plaintext {
         font-weight: normal;
     }
-    #logs_container {
-    height: 500px;
-    overflow-y: scroll;
-    background-color: white;
-    padding: 10px;
-    border: 1px solid #ccc;
-    margin-top: 20px;
-    }
 
+    /* Light Theme Logs Container (overridden if theme-dark is applied) */
+    #logs_container {
+        height: 500px;
+        overflow-y: scroll;
+        background-color: white;
+        padding: 10px;
+        border: 1px solid #ccc;
+        margin-top: 20px;
+    }
     #logs_content {
         color: #ffffff;
         white-space: pre-wrap;
         word-wrap: break-word;
     }
-
     .log-line {
         display: block;
         white-space: pre;
@@ -235,6 +340,6 @@
     }
 </style>
 
-<!-- Include the runs.js script -->
+<!-- Include runs.js Script -->
 <script src="/static/src/runs.js"></script>
 {% endblock %}
