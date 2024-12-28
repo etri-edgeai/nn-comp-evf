@@ -1,88 +1,196 @@
+"""
+Module: deploy.py
+Description:
+This module handles the deployment of files, including listing run directories, downloading files, 
+and transferring files using SCP or FTP. It provides a secure interface for managing deployment 
+within a Flask-based application.
+
+Features:
+- Render a deployment page.
+- List directory trees for project runs.
+- Download files directly from the server.
+- Transfer files to remote servers using SCP or FTP.
+
+Dependencies:
+- Flask: For route handling and request/response management.
+- Paramiko: For SCP/SFTP file transfers.
+- ftplib: For FTP file transfers.
+- os, json: For file system operations and JSON parsing.
+
+Author: Junyong Park
+"""
+
 import os
-import subprocess
-from flask import Blueprint, jsonify, request, session, render_template
-from threading import Lock
-from auth import session_required
+import json
+import paramiko  # pip install paramiko
+from ftplib import FTP
+from flask import Blueprint, request, session, send_file, jsonify, abort, render_template
+from auth import session_required  # Import your session management decorator
 
-monitor_bp = Blueprint('monitor', __name__)
+# Initialize Blueprint for deployment-related routes
+deploy_bp = Blueprint('deploy', __name__)
 
-# Dictionary to track active TensorBoard processes
-tensorboard_processes = {}
-process_lock = Lock()
+@deploy_bp.route('/', methods=['GET'])
+def show_deploy():
+    """
+    Renders the Deploy page at /deploy/.
+    """
+    if 'user' not in session:
+        return abort(401, description="Unauthorized - user not in session")
+    return render_template('deploy.html')
 
+@deploy_bp.route('/list_run_files', methods=['GET'])
+def list_run_files():
+    """
+    Returns a JSON directory tree for the run.
+    Endpoint: GET /deploy/list_run_files?project_name=...&run_name=...
+    """
+    if 'user' not in session:
+        return abort(401, description="Unauthorized")
 
-def start_tensorboard(user, project_name):
-    """Start TensorBoard for the given user and project."""
-    with process_lock:
-        if project_name in tensorboard_processes:
-            return {"message": "TensorBoard already running", "port": 6006}
+    user = session['user']
+    project_name = request.args.get('project_name')
+    run_name = request.args.get('run_name')
+    if not project_name or not run_name:
+        return jsonify({"error": "Missing project_name or run_name"}), 400
 
-        logdir = os.path.join('workspace', user, project_name, 'runs')
+    base_dir = os.path.join('workspace', user, project_name, 'runs', run_name)
+    if not os.path.exists(base_dir):
+        return jsonify({"error": f"Run directory not found: {base_dir}"}), 404
+
+    def get_directory_tree(folder_path):
+        tree = {
+            "name": os.path.basename(folder_path),
+            "path": folder_path,
+            "type": "directory",
+            "children": []
+        }
         try:
-            process = subprocess.Popen(
-                ['tensorboard', '--logdir', logdir, '--port', '6006', '--host', '0.0.0.0'],
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
-            )
-            tensorboard_processes[project_name] = process
-            return {"message": "TensorBoard started", "port": 6006}
-        except Exception as e:
-            return {"error": f"Failed to start TensorBoard: {str(e)}"}
+            for entry in os.scandir(folder_path):
+                if entry.is_dir():
+                    tree["children"].append(get_directory_tree(entry.path))
+                else:
+                    tree["children"].append({
+                        "name": entry.name,
+                        "path": entry.path,
+                        "type": "file"
+                    })
+        except PermissionError:
+            pass
+        return tree
 
+    tree_data = get_directory_tree(base_dir)
+    return jsonify({"tree": tree_data}), 200
 
-def stop_tensorboard(project_name):
-    """Stop TensorBoard for the given project."""
-    with process_lock:
-        if project_name in tensorboard_processes:
-            process = tensorboard_processes.pop(project_name)
-            process.terminate()
-            return {"message": "TensorBoard stopped"}
-        return {"message": "TensorBoard is not running"}
+@deploy_bp.route('/transfer', methods=['GET', 'POST'])
+def deploy_transfer():
+    """
+    Handles file transfers via download (GET) or SCP/FTP upload (POST).
+    GET /deploy/transfer?method=download&file=...
+    POST /deploy/transfer:
+    {
+        "method": "scp" or "ftp",
+        "file": "/abs/path/to/file",
+        "host": "...",
+        "port": 22 or 21,
+        "username": "...",
+        "password": "...",
+        "remote_path": "..."
+    }
+    """
+    if 'user' not in session:
+        return abort(401, description="Unauthorized")
 
+    if request.method == 'GET':
+        method = request.args.get("method")
+        file_path = request.args.get("file")
+        if method != "download":
+            return abort(400, description="GET only supports method=download")
+        if not file_path or not os.path.exists(file_path):
+            return abort(404, description="File not found for download.")
+        return send_file(file_path, as_attachment=True)
 
-@monitor_bp.route('/')
-@session_required
-def monitor_page():
-    """Render the monitoring page."""
-    return render_template('monitor.html')
+    elif request.method == 'POST':
+        data = request.get_json() or {}
+        method = data.get("method")
+        file_path = data.get("file")
 
+        if not method or not file_path:
+            return jsonify({"error": "Missing 'method' or 'file' in request."}), 400
+        if not os.path.exists(file_path):
+            return jsonify({"error": f"File not found: {file_path}"}), 404
 
-@monitor_bp.route('/start', methods=['POST'])
-@session_required
-def start_monitoring():
-    """Start TensorBoard for the current user and project."""
-    user = session.get('user')
-    project_name = session.get('project')
+        if method == "scp":
+            return scp_file(data)
+        elif method == "ftp":
+            return ftp_file(data)
+        else:
+            return jsonify({"error": f"Unsupported method: {method}"}), 400
 
-    if not user or not project_name:
-        return jsonify({"error": "User or project not set in session"}), 400
+def scp_file(payload):
+    """
+    Transfers a file via SCP using Paramiko.
+    Payload:
+    {
+      "file": "/local/path",
+      "host": "...",
+      "port": 22,
+      "username": "...",
+      "password": "...",
+      "remote_path": "/remote/path/filename"
+    }
+    """
+    file_path = payload["file"]
+    host = payload.get("host", "localhost")
+    port = int(payload.get("port", 22))
+    username = payload.get("username", "")
+    password = payload.get("password", "")
+    remote_path = payload.get("remote_path", "/tmp/deployed_model.pth")
 
-    response = start_tensorboard(user, project_name)
-    if "error" in response:
-        return jsonify({"error": response["error"]}), 500
-    return jsonify({"message": response["message"], "port": response["port"]}), 200
+    transport = paramiko.Transport((host, port))
+    try:
+        transport.connect(username=username, password=password)
+        sftp = paramiko.SFTPClient.from_transport(transport)
+        sftp.put(file_path, remote_path)
+    finally:
+        transport.close()
 
+    return jsonify({"message": f"SCP to {host}:{remote_path} succeeded."})
 
-@monitor_bp.route('/stop', methods=['POST'])
-@session_required
-def stop_monitoring():
-    """Stop TensorBoard for the current project."""
-    project_name = session.get('project')
-    if not project_name:
-        return jsonify({"error": "Project not set in session"}), 400
+def ftp_file(payload):
+    """
+    Transfers a file via FTP.
+    Payload:
+    {
+      "file": "/local/path",
+      "host": "...",
+      "port": 21,
+      "username": "...",
+      "password": "...",
+      "remote_path": "filename or subdir/filename"
+    }
+    """
+    file_path = payload["file"]
+    host = payload.get("host", "localhost")
+    port = int(payload.get("port", 21))
+    username = payload.get("username", "")
+    password = payload.get("password", "")
+    remote_path = payload.get("remote_path", None)
 
-    response = stop_tensorboard(project_name)
-    return jsonify({"message": response["message"]})
+    ftp_filename = os.path.basename(remote_path) if remote_path else os.path.basename(file_path)
+    ftp_subdir = os.path.dirname(remote_path) if remote_path else ""
 
+    with FTP() as ftp:
+        ftp.connect(host=host, port=port, timeout=30)
+        ftp.login(user=username, passwd=password)
+        if ftp_subdir:
+            try:
+                ftp.cwd(ftp_subdir)
+            except:
+                ftp.mkd(ftp_subdir)
+                ftp.cwd(ftp_subdir)
 
-@monitor_bp.route('/status', methods=['GET'])
-@session_required
-def tensorboard_status():
-    """Check if TensorBoard is running for the current project."""
-    project_name = session.get('project')
-    if not project_name:
-        return jsonify({"error": "Project not set in session"}), 400
+        with open(file_path, 'rb') as f:
+            ftp.storbinary(f"STOR {ftp_filename}", f)
 
-    if project_name in tensorboard_processes:
-        return jsonify({"status": "running", "port": 6006})
-    return jsonify({"status": "stopped"})
+    return jsonify({"message": f"FTP to {host}:{remote_path or ftp_filename} succeeded."})
