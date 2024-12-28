@@ -1,3 +1,20 @@
+"""
+Module: optimizations.py
+Description:
+This module provides API endpoints and helper functions to manage optimization tasks for machine learning projects 
+in a Flask application. It supports CRUD operations for optimizations and integrates with project metadata.
+
+Features:
+- Load, save, edit, reorder, and delete optimizations.
+- Fetch optimization templates and file content.
+- Update `project.json` with optimization details.
+
+Dependencies:
+- Flask: For handling HTTP requests and responses.
+- JSON, OS, Shutil: For file and directory operations and metadata management.
+
+Author: Junyong Park
+"""
 import os
 import json
 import shutil
