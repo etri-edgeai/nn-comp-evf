@@ -2,21 +2,31 @@
 // Handles TensorBoard start, stop, and status checking for the monitor module
 
 var Monitor = (function() {
-    // Derive the base URL dynamically
+    // ----------------------------------------------------
+    // Derive the base URL dynamically (protocol + hostname)
+    // ----------------------------------------------------
     const baseUrl = `${window.location.protocol}//${window.location.hostname}`;
     const tensorboardPort = 6006;
 
+    // ----------------------------------------------------
     // Ensure buttons and status elements exist in the DOM
-    const startButton = document.getElementById('start_tensorboard_btn');
-    const stopButton = document.getElementById('stop_tensorboard_btn');
+    // ----------------------------------------------------
+    const startButton  = document.getElementById('start_tensorboard_btn');
+    const stopButton   = document.getElementById('stop_tensorboard_btn');
     const statusElement = document.getElementById('monitor_status');
     const iframeElement = document.getElementById('monitor_iframe');
 
     if (!startButton || !stopButton || !statusElement || !iframeElement) {
-        console.error("Required DOM elements are missing: startButton, stopButton, statusElement, or iframeElement.");
+        console.error(
+            "Required DOM elements are missing: " +
+            "startButton, stopButton, statusElement, or iframeElement."
+        );
         return;
     }
 
+    // ----------------------------------------------------
+    // Start TensorBoard
+    // ----------------------------------------------------
     async function startTensorBoard() {
         if (!App.AppState.currentProject) {
             alert("No project selected. Please select a project first.");
@@ -24,7 +34,7 @@ var Monitor = (function() {
         }
 
         try {
-            startButton.disabled = true; // Disable button during processing
+            startButton.disabled = true; // Disable during request
             const response = await fetch('/monitor/start', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -45,10 +55,13 @@ var Monitor = (function() {
             console.error("Failed to start TensorBoard:", error);
             alert("Failed to start TensorBoard. Check console for details.");
         } finally {
-            startButton.disabled = false; // Re-enable button
+            startButton.disabled = false; // Re-enable
         }
     }
 
+    // ----------------------------------------------------
+    // Stop TensorBoard
+    // ----------------------------------------------------
     async function stopTensorBoard() {
         if (!App.AppState.currentProject) {
             alert("No project selected. Please select a project first.");
@@ -56,7 +69,7 @@ var Monitor = (function() {
         }
 
         try {
-            stopButton.disabled = true; // Disable button during processing
+            stopButton.disabled = true; // Disable during request
             const response = await fetch('/monitor/stop', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -76,10 +89,13 @@ var Monitor = (function() {
             console.error("Failed to stop TensorBoard:", error);
             alert("Failed to stop TensorBoard. Check console for details.");
         } finally {
-            stopButton.disabled = false; // Re-enable button
+            stopButton.disabled = false; // Re-enable
         }
     }
 
+    // ----------------------------------------------------
+    // Check TensorBoard Status
+    // ----------------------------------------------------
     async function checkTensorBoardStatus() {
         if (!App.AppState.currentProject) {
             console.log("No project selected for monitoring.");
@@ -89,7 +105,9 @@ var Monitor = (function() {
         }
 
         try {
-            const response = await fetch(`/monitor/status?project_name=${App.AppState.currentProject}`);
+            const response = await fetch(
+                `/monitor/status?project_name=${App.AppState.currentProject}`
+            );
             const data = await response.json();
 
             if (data.status === "running") {
@@ -107,17 +125,25 @@ var Monitor = (function() {
         }
     }
 
+    // ----------------------------------------------------
+    // Update the Monitor View (refresh status)
+    // ----------------------------------------------------
     function updateMonitorView() {
         checkTensorBoardStatus();
     }
 
-    // Attach event listeners to buttons
+    // ----------------------------------------------------
+    // Attach event listeners
+    // ----------------------------------------------------
     startButton.addEventListener('click', startTensorBoard);
     stopButton.addEventListener('click', stopTensorBoard);
 
-    // Initial status check when the page loads
+    // Check status once DOM is loaded
     document.addEventListener('DOMContentLoaded', updateMonitorView);
 
+    // ----------------------------------------------------
+    // Public API
+    // ----------------------------------------------------
     return {
         startTensorBoard: startTensorBoard,
         stopTensorBoard: stopTensorBoard,
