@@ -1,3 +1,24 @@
+"""
+Module: project.py
+Description:
+This module provides API routes for managing user projects in a Flask-based application. It includes functionality for creating, deleting, updating, and retrieving projects, as well as managing project metadata stored in `project.json`.
+
+Features:
+- Create a new project with a predefined structure.
+- List all projects for a user.
+- Retrieve and update `project.json` for a project.
+- Set and get the current active project in the user session.
+- Delete projects and their associated data.
+
+Dependencies:
+- Flask: For handling HTTP requests and responses.
+- OS/Shutil: For file system operations.
+- JSON: For reading and writing project metadata.
+- Regex: For validating project names.
+
+Author: Junyong Park
+"""
+
 import os
 import shutil
 import re
