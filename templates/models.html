@@ -166,8 +166,8 @@
 
     /* Directory Tree Styles */
     .directory-tree {
-        background-color: white;
-        border: 1px solid #dee2e6;
+        background-color: #1e1e2f; /* Darker background for dark mode */
+        border: 1px solid #4c4c6d; /* Subtle border color */
         border-radius: 4px;
         overflow-y: auto;
         max-height: 500px;
@@ -179,18 +179,21 @@
         padding: 6px 8px;
         border-radius: 4px;
         margin-bottom: 2px;
-        transition: background-color 0.2s;
+        transition: background-color 0.2s, color 0.2s;
         user-select: none;
         display: flex;
         align-items: center;
+        color: #d1d5db; /* Lighter text color for better visibility */
     }
 
     .tree-item:hover {
-        background-color: rgba(13, 110, 253, 0.05);
+        background-color: #2e2e4f; /* Slightly lighter background on hover */
+        color: #ffffff; /* White text on hover */
     }
 
     .tree-item.active {
-        background-color: rgba(13, 110, 253, 0.1);
+        background-color: #4c4c6d; /* Highlighted background for active item */
+        color: #ffffff; /* White text for active item */
     }
 
     .tree-toggle {
@@ -200,6 +203,11 @@
         align-items: center;
         justify-content: center;
         margin-right: 4px;
+        color: #a1a1b1; /* Subtle icon color */
+    }
+
+    .tree-toggle:hover {
+        color: #ffffff; /* White icon on hover */
     }
 
     .tree-children {
