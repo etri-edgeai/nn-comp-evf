@@ -40,6 +40,41 @@ $(document).ready(function() {
         }
     }
     
+    async function exploreRun(runName) {
+        console.log("Exploring run:", runName);
+    
+        const projectName = sessionStorage.getItem('project_name');
+        if (!projectName) {
+            console.error("No project name found in sessionStorage.");
+            toastr.error("Project name not found. Please reload the page.");
+            return;
+        }
+    
+        const queryParams = new URLSearchParams({
+            project_name: projectName,
+            run_name: runName
+        });
+    
+        try {
+            const response = await fetch(`/deploy/list_run_files?${queryParams.toString()}`);
+            const data = await response.json();
+    
+            if (data.error) {
+                console.error("Error fetching directory tree:", data.error);
+                toastr.error(data.error);
+                return;
+            }
+    
+            $('#id_explore_run_name').text(runName); // Update the explorer header
+            const $treeContainer = $('#id_directory_tree');
+            $treeContainer.empty(); // Clear any existing tree
+            renderDirectoryTree(data.tree, $treeContainer); // Render the new tree
+        } catch (err) {
+            console.error("Error fetching directory tree:", err);
+            toastr.error("Failed to load directory tree.");
+        }
+    }
+
     function updateRunsTable(runs) {
         const $tableBody = $('#id_table_body_deploy_runs');
         $tableBody.empty();
@@ -52,7 +87,7 @@ $(document).ready(function() {
         runs.forEach(run => {
             const gpuList = (run.gpu_ids || []).join(', ') || 'N/A';
             const actions = `
-                <button class="btn btn-sm btn-info" onclick="exploreRun('${run.run_name}')">Explore</button>
+                <button class="btn btn-sm btn-info explore-run-btn" data-run-name="${run.run_name}">Explore</button>
             `;
             const row = `
                 <tr>
@@ -208,6 +243,11 @@ $(document).ready(function() {
             console.error("Error deploying file:", err);
             toastr.error("Error deploying file.");
         }
+    });
+
+    $('#id_table_body_deploy_runs').on('click', '.explore-run-btn', function() {
+        const runName = $(this).data('run-name');
+        exploreRun(runName);
     });
 
     // INITIALIZE
