@@ -1,346 +1,413 @@
-// Theme Management
-class ThemeManager {
-    constructor() {
-        this.themeLink = document.getElementById('theme-link'); // If any <link> element is used for theming
-        this.toggleButton = document.getElementById('dark-mode-toggle');
-        this.body = document.body;
-        this.initialize();
-    }
+// Base Application Module
+const App = (function() {
+    // State Management
+    const AppState = {
+        lastSelectedOption: "dashboard",
+        currentProject: null,
+        projects: [],
+        models: [],
+        datasets: []
+    };
 
-    // Initialize theme and button handler
-    initialize() {
-        // Check local storage for theme; default to 'light'
-        const savedTheme = localStorage.getItem('theme') || 'light';
-        this.applyTheme(savedTheme);
-
-        // Toggle between 'light' and 'dark' on button click
-        this.toggleButton.addEventListener('click', () => {
-            const newTheme = this.getCurrentTheme() === 'light' ? 'dark' : 'light';
-            this.applyTheme(newTheme);
-            localStorage.setItem('theme', newTheme);
-        });
-    }
-
-    // Apply the selected theme
-    applyTheme(theme) {
-        const isDark = (theme === 'dark');
-
-        // Toggle a .theme-dark class on <body>
-        document.body.classList.toggle('theme-dark', isDark);
-
-        // Update the toggle button text
-        this.toggleButton.textContent = isDark ? 'Light Mode' : 'Dark Mode';
-
-        // Additional UI changes for forms, modals, and project selector
-        this.updateFormElements(theme);
-        this.updateModals(theme);
-        this.updateProjectSelector(theme);
-    }
-
-    // Form elements background and text color for light/dark
-    updateFormElements(theme) {
-        const isDark = (theme === 'dark');
-        document.querySelectorAll('.form-control, .form-select').forEach(element => {
-            if (isDark) {
-                element.style.backgroundColor = '#1a1f24';
-                element.style.color = '#ffffff';
-                element.style.borderColor = '#2c3338';
-            } else {
-                // Reset to defaults when light theme
-                element.style.backgroundColor = '';
-                element.style.color = '';
-                element.style.borderColor = '';
+    // UI Constants
+    const UI = {
+        selectors: {
+            projectSelect: '#id_project',
+            createProjectBtn: '#id_create_project_ok',
+            deleteProjectBtn: '#id_delete_project_ok',
+            logoutBtn: '#id_logout_ok',
+            projectNameInput: '#id_project_name',
+            createProjectModal: '#id_modal_create_project',
+            deleteProjectModal: '#id_modal_delete_project',
+            sidebarItems: {
+                dashboard: '#sidebar_dashboard',
+                datasets: '#sidebar_datasets',
+                models: '#sidebar_models',
+                experiments: '#sidebar_experiments',
+                optimizations: '#sidebar_optimizations',
+                deployment: '#sidebar_deployment',
+                monitoring: '#sidebar_monitoring'
             }
-        });
-    }
-
-    // Modals background color/text color for dark mode
-    updateModals(theme) {
-        const isDark = (theme === 'dark');
-        document.querySelectorAll('.modal-content').forEach(modal => {
-            if (isDark) {
-                modal.classList.add('bg-dark', 'text-white');
-            } else {
-                modal.classList.remove('bg-dark', 'text-white');
-            }
-        });
-    }
-
-    // Project selector background and text color
-    updateProjectSelector(theme) {
-        const projectSelect = document.getElementById('id_project');
-        if (projectSelect) {
-            if (theme === 'dark') {
-                projectSelect.style.backgroundColor = '#1a1f24';
-                projectSelect.style.color = '#ffffff';
-            } else {
-                projectSelect.style.backgroundColor = '';
-                projectSelect.style.color = '';
+        },
+        messages: {
+            errors: {
+                projectRequired: 'Project name is required',
+                invalidProjectName: 'Project name can only contain letters, numbers, hyphens, and underscores',
+                noProjectSelected: 'No project selected',
+                loadFailed: 'Failed to load projects',
+                createFailed: 'Failed to create project',
+                deleteFailed: 'Failed to delete project',
+                logoutFailed: 'Failed to logout'
+            },
+            success: {
+                projectCreated: 'Project created successfully',
+                projectDeleted: 'Project deleted successfully',
+                logoutSuccess: 'Logged out successfully'
             }
         }
-    }
+    };
 
-    // Get the current theme from local storage
-    getCurrentTheme() {
-        return localStorage.getItem('theme') || 'light';
-    }
-}
+    // Project Management
+    const ProjectManager = {
 
-// Toast Notification Management
-class ToastManager {
-    constructor() {
-        this.configure();
-    }
 
-    // Toastr Configuration
-    configure() {
-        toastr.options = {
-            closeButton: true,
-            progressBar: true,
-            positionClass: "toast-bottom-right",
-            showDuration: "300",
-            hideDuration: "100",
-            timeOut: "1000",
-            extendedTimeOut: "1000",
-            showMethod: "fadeIn",
-            hideMethod: "fadeOut"
-        };
-    }
-
-    // Various toast methods
-    success(message) {
-        toastr.success(message);
-    }
-
-    error(message) {
-        toastr.error(message);
-    }
-
-    warning(message) {
-        toastr.warning(message);
-    }
-
-    info(message) {
-        toastr.info(message);
-    }
-}
-
-// Navigation Management (Highlight active nav item)
-class NavigationManager {
-    constructor() {
-        this.highlightActiveNavItem();
-    }
-
-    highlightActiveNavItem() {
-        const currentPath = window.location.pathname;
-
-        // For each link in .navbar-nav, add/remove 'active' based on current URL
-        document.querySelectorAll(".navbar-nav .nav-link").forEach(link => {
-            if (link.href.includes(currentPath)) {
-                link.classList.add("active");
-            } else {
-                link.classList.remove("active");
-            }
-        });
-    }
-}
-
-// Project Management
-class ProjectManager {
-    constructor() {
-        // DOM elements
-        this.projectSelect = document.getElementById('id_project');
-        this.createProjectBtn = document.getElementById('id_create_project_ok');
-        this.deleteProjectBtn = document.getElementById('id_delete_project_ok');
-        this.projectNameInput = document.getElementById('id_project_name');
         
-        // Use a ToastManager instance to show toast messages
-        this.toastManager = new ToastManager();
 
-        this.initialize();
-    }
-
-    // Setup event listeners and initial loading
-    async initialize() {
-        if (this.createProjectBtn) {
-            this.createProjectBtn.addEventListener('click', () => this.createProject());
-        }
-        
-        if (this.deleteProjectBtn) {
-            this.deleteProjectBtn.addEventListener('click', () => this.deleteProject());
-        }
-
-        if (this.projectSelect) {
-            // Try to get current project from server, or restore from localStorage
-            await this.loadCurrentProject();
-
-            // On changing the project in select
-            this.projectSelect.addEventListener('change', () => this.handleProjectChange());
-
-            // Finally, load the projects list
-            await this.loadProjects();
-        }
-    }
-
-    // Get current project from the server
-    async loadCurrentProject() {
-        try {
-            const response = await fetch('/project/current_project', {
-                method: 'GET'
-            });
-            const data = await response.json();
-
-            if (!data.err && data.res.project_name) {
-                // Sync the project name with both local and session storage
-                localStorage.setItem('currentProject', data.res.project_name);
-                sessionStorage.setItem('project_name', data.res.project_name);
-            } else {
-                // If server has no record, but localStorage has one, try to restore
-                const savedProject = localStorage.getItem('currentProject');
-                if (savedProject) {
-                    await this.handleProjectChange(savedProject);
-                    sessionStorage.setItem('project_name', savedProject);
+        async loadProjects() {
+            try {
+                const response = await fetch('/project/list', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                const data = await response.json();
+                
+                if (!data.err) {
+                    AppState.projects = data.res.projects || [];
+                    UIManager.updateProjectList(AppState.projects);
+                    return true;
                 }
+                NotificationManager.error(data.err);
+                return false;
+            } catch (error) {
+                console.error('Load projects error:', error);
+                NotificationManager.error(UI.messages.errors.loadFailed);
+                return false;
             }
-        } catch (error) {
-            console.error('Error loading current project:', error);
+        },
+
+        async createProject(projectName) {
+            console.log('Creating project:', projectName);
+            try {
+                // Get button and store original text first
+                const $createBtn = $(UI.selectors.createProjectBtn);
+                const originalText = $createBtn.text() || 'Create';  // Store original text with fallback
+                
+                // Show loading state
+                $createBtn.prop('disabled', true).text('Creating...');
+        
+                // Validate
+                if (!projectName) {
+                    NotificationManager.error(UI.messages.errors.projectRequired);
+                    $createBtn.prop('disabled', false).text(originalText);
+                    return false;
+                }
+                
+                if (!this.validateProjectName(projectName)) {
+                    NotificationManager.error(UI.messages.errors.invalidProjectName);
+                    $createBtn.prop('disabled', false).text(originalText);
+                    return false;
+                }
+        
+                const response = await fetch("/project/create", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ project_name: projectName })
+                });
+        
+                const data = await response.json();
+                console.log('Create project response:', data);
+                
+                if (!data.err) {
+                    AppState.currentProject = projectName;
+                    SessionManager.setProject(projectName);
+                    NotificationManager.success(UI.messages.success.projectCreated);
+                    
+                    // Reset form and close modal
+                    $(UI.selectors.projectNameInput).val('');
+                    const modalElement = document.querySelector(UI.selectors.createProjectModal);
+                    if (modalElement) {
+                        const modal = bootstrap.Modal.getInstance(modalElement);
+                        if (modal) modal.hide();
+                    }
+                    
+                    await this.loadProjects();
+                    return true;
+                } else {
+                    NotificationManager.error(data.err);
+                    return false;
+                }
+            } catch (error) {
+                console.error("Create project error:", error);
+                NotificationManager.error(UI.messages.errors.createFailed);
+                return false;
+            } finally {
+                // Reset button state using jQuery find to ensure we get the right button
+                const $btn = $(UI.selectors.createProjectBtn);
+                $btn.prop('disabled', false).text($btn.data('originalText') || 'Create');
+            }
+        },
+        
+        async  syncProjectToServer(projectName) {
+            try {
+                const response = await fetch('/project/current_project', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ project: projectName })
+                });
+                const data = await response.json();
+                if (data.err) {
+                    console.error('Failed to sync project to server:', data.err);
+                }
+            } catch (error) {
+                console.error('Error syncing project to server:', error);
+            }
+        },
+
+        async deleteProject(projectName) {
+            try {
+                if (!projectName) {
+                    NotificationManager.error(UI.messages.errors.noProjectSelected);
+                    return false;
+                }
+
+                const response = await fetch("/project/delete", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ project_name: projectName })
+                });
+
+                const data = await response.json();
+                if (!data.err) {
+                    NotificationManager.success(UI.messages.success.projectDeleted);
+                    AppState.currentProject = null;
+                    SessionManager.clearProject();
+                    $(UI.selectors.deleteProjectModal).modal('hide');
+                    await this.loadProjects();
+                    return true;
+                }
+                NotificationManager.error(data.err);
+                return false;
+            } catch (error) {
+                console.error("Delete project error:", error);
+                NotificationManager.error(UI.messages.errors.deleteFailed);
+                return false;
+            }
+        },
+
+        validateProjectName(name) {
+            return /^[a-zA-Z0-9_-]+$/.test(name);
         }
-    }
+    };
 
-    // Load the full list of projects and populate the <select>
-    async loadProjects() {
-        try {
-            const response = await fetch('/project/list', {
+    // Session Management
+    const SessionManager = {
+        setProject(projectName) {
+            sessionStorage.setItem("project_name", projectName);
+            // Add this new fetch call to sync with server
+            fetch('/project/current_project', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' }
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ project: projectName }) // Note: 'project', not 'project_name'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.err) {
+                    console.error('Failed to sync project to server:', data.err);
+                }
+            })
+            .catch(error => {
+                console.error('Error syncing project to server:', error);
             });
-            const data = await response.json();
+        },
 
-            if (data.err) {
-                this.toastManager.error(data.err);
+        getProject() {
+            return sessionStorage.getItem("project_name");
+        },
+
+        clearProject() {
+            sessionStorage.removeItem("project_name");
+        },
+
+        async verifySessionState() {
+            try {
+                const response = await fetch('/project/current_project', {
+                    method: 'GET',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                const data = await response.json();
+                
+                if (!data.err && data.res.project) {
+                    AppState.currentProject = data.res.project;
+                    this.setProject(data.res.project);
+                } else {
+                    AppState.currentProject = null;
+                    this.clearProject();
+                }
+            } catch (error) {
+                console.error('Session verification error:', error);
+                AppState.currentProject = null;
+                this.clearProject();
+            }
+        }
+    };
+
+    // UI Management
+    const UIManager = {
+        updateProjectList(projects) {
+            const $select = $(UI.selectors.projectSelect);
+            const currentProject = AppState.currentProject || SessionManager.getProject();
+            
+            // Clear and initialize select
+            $select.empty();
+            $select.append($('<option>', {
+                value: '',
+                text: 'Select Project',
+                selected: !currentProject
+            }));
+    
+            // Add project options
+            if (Array.isArray(projects) && projects.length > 0) {
+                projects.forEach(project => {
+                    $select.append($('<option>', {
+                        value: project,
+                        text: project,
+                        selected: project === currentProject
+                    }));
+                });
+    
+                // Set first project if none selected
+                if (!currentProject) {
+                    AppState.currentProject = projects[0];
+                    SessionManager.setProject(projects[0]);
+                    $select.val(projects[0]);
+                } else {
+                    $select.val(currentProject);
+                }
+    
+                // Enable/disable delete button
+                $('#btn_delete_project').prop('disabled', !currentProject);
+            }
+        },
+    
+        initializeEventHandlers() {
+            // Project creation
+            $(document).on('click', UI.selectors.createProjectBtn, async (e) => {
+                e.preventDefault();
+                const projectName = $(UI.selectors.projectNameInput).val().trim();
+                if (projectName) {
+                    await ProjectManager.createProject(projectName);
+                } else {
+                    NotificationManager.error(UI.messages.errors.projectRequired);
+                }
+            });
+    
+            // Project deletion
+            $(document).on('click', UI.selectors.deleteProjectBtn, async (e) => {
+                e.preventDefault();
+                if (AppState.currentProject) {
+                    await ProjectManager.deleteProject(AppState.currentProject);
+                } else {
+                    NotificationManager.error(UI.messages.errors.noProjectSelected);
+                }
+            });
+    
+            // Project selection change
+            $(document).on('change', UI.selectors.projectSelect, function() {
+                const selectedProject = $(this).val();
+                if (selectedProject) {
+                    AppState.currentProject = selectedProject;
+                    SessionManager.setProject(selectedProject);
+                    syncProjectToServer(selectedProject); // Add this line
+                    $('#btn_delete_project').prop('disabled', false);
+                    NavigationManager.updateUIForProject(selectedProject);
+                } else {
+                    $('#btn_delete_project').prop('disabled', true);
+                    AppState.currentProject = null;
+                    SessionManager.clearProject();
+                }
+            });
+    
+            // Sidebar navigation - using event delegation
+            $(document).on('click', Object.values(UI.selectors.sidebarItems).join(','), function(e) {
+                e.preventDefault();
+                const section = Object.keys(UI.selectors.sidebarItems).find(
+                    key => UI.selectors.sidebarItems[key] === `#${this.id}`
+                );
+                if (section) {
+                    NavigationManager.handleSidebarClick(section);
+                }
+            });
+    
+            // Logout
+            $(document).on('click', UI.selectors.logoutBtn, async (e) => {
+                e.preventDefault();
+                await AuthManager.handleLogout();
+            });
+        }
+    };
+
+    // Navigation Management
+    const NavigationManager = {
+        handleSidebarClick(section) {
+            AppState.lastSelectedOption = section;
+            this.loadContentBasedOnCurrentView(section);
+        },
+
+        updateUIForProject(projectName) {
+            document.title = `${projectName} - Edge Vision Framework`;
+            this.loadContentBasedOnCurrentView(AppState.lastSelectedOption);
+        },
+
+        async loadContentBasedOnCurrentView(view) {
+            if (!AppState.currentProject) {
+                NotificationManager.error(UI.messages.errors.noProjectSelected);
                 return;
             }
 
-            // Remove old options (except the first "Select Project")
-            while (this.projectSelect.options.length > 1) {
-                this.projectSelect.remove(1);
-            }
+            // Add specific view loading logic here
+            console.log(`Loading view: ${view}`);
+        }
+    };
 
-            // Populate new project options
-            if (data.res && data.res.projects) {
-                data.res.projects.forEach(projectName => {
-                    const option = new Option(projectName, projectName);
-                    this.projectSelect.add(option);
+    // Authentication Management
+    const AuthManager = {
+        async handleLogout() {
+            try {
+                const response = await fetch("/auth/logout", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" }
                 });
+
+                const data = await response.json();
+                if (!data.err) {
+                    AppState.currentProject = null;
+                    SessionManager.clearProject();
+                    window.location.href = "/auth/login";
+                } else {
+                    NotificationManager.error(data.err);
+                }
+            } catch (error) {
+                console.error("Logout error:", error);
+                NotificationManager.error(UI.messages.errors.logoutFailed);
             }
-
-            // If we have a currently selected project, set it
-            const currentProject = localStorage.getItem('currentProject');
-            if (currentProject) {
-                this.projectSelect.value = currentProject;
-            }
-        } catch (error) {
-            this.toastManager.error('Failed to load projects');
-            console.error('Error loading projects:', error);
         }
-    }
+    };
 
-    // Create a new project by name
-    async createProject() {
-        const projectName = this.projectNameInput.value.trim();
-        if (!projectName) {
-            this.toastManager.warning('Please enter a project name');
-            return;
+    // Notification Management
+    const NotificationManager = {
+        success(message) {
+            toastr.success(message);
+        },
+        error(message) {
+            toastr.error(message);
         }
+    };
 
-        try {
-            const response = await fetch('/project/create', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ project_name: projectName })
-            });
-            const data = await response.json();
-
-            if (data.err) {
-                this.toastManager.error(data.err);
-            } else {
-                this.toastManager.success('Project created successfully');
-                this.loadProjects();
-                $('#id_modal_create_project').modal('hide');
-                this.projectNameInput.value = '';
-            }
-        } catch (error) {
-            this.toastManager.error('Error creating project');
-            console.error('Error:', error);
+    $(document).ready(async () => {
+        UIManager.initializeEventHandlers();
+        await SessionManager.verifySessionState();
+        const currentProject = AppState.currentProject || SessionManager.getProject();
+        if (currentProject) {
+            syncProjectToServer(currentProject); // Add this line
         }
-    }
+        await ProjectManager.loadProjects();
+    });
 
-    // Delete the currently selected project
-    async deleteProject() {
-        const projectName = this.projectSelect.value;
-        if (!projectName) {
-            this.toastManager.warning('Please select a project to delete');
-            return;
-        }
-
-        try {
-            const response = await fetch('/project/delete', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ project_name: projectName })
-            });
-            const data = await response.json();
-
-            if (data.err) {
-                this.toastManager.error(data.err);
-            } else {
-                this.toastManager.success('Project deleted successfully');
-                this.loadProjects();
-                $('#id_modal_delete_project').modal('hide');
-            }
-        } catch (error) {
-            this.toastManager.error('Error deleting project');
-            console.error('Error:', error);
-        }
-    }
-
-    // Handle changing the project selection
-    async handleProjectChange() {
-        const selectedProject = this.projectSelect.value;
-        if (!selectedProject) return;
-
-        try {
-            const response = await fetch('/project/current_project', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ project: selectedProject })
-            });
-            const data = await response.json();
-
-            if (data.err) {
-                this.toastManager.error(data.err);
-                localStorage.removeItem('currentProject');
-                sessionStorage.removeItem('project_name');
-            } else {
-                localStorage.setItem('currentProject', selectedProject);
-                sessionStorage.setItem('project_name', selectedProject);
-                // Reload the page to refresh components
-                window.location.reload();
-            }
-        } catch (error) {
-            this.toastManager.error('Error setting current project');
-            console.error('Error:', error);
-        }
-    }
-}
-
-// Once the DOM is ready, initialize everything
-document.addEventListener('DOMContentLoaded', () => {
-    window.themeManager = new ThemeManager();
-    window.toastManager = new ToastManager();
-    window.navigationManager = new NavigationManager();
-    window.projectManager = new ProjectManager();
-});
-
-// Expose the current theme as a global function if needed
-window.getCurrentTheme = () => window.themeManager.getCurrentTheme();
+    // Public API
+    return {
+        AppState,
+        ProjectManager,
+        SessionManager,
+        UIManager
+    };
+})();
